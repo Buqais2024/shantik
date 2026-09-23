@@ -1,0 +1,22 @@
+{
+  "name": "Shantik — حاسبة الأسعار",
+  "short_name": "Shantik",
+  "description": "Shantik pricing calculator",
+  "lang": "ar",
+  "dir": "rtl",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#F7F2E9",
+  "theme_color": "#F7F2E9",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "تسعيرة التطريز", "url": "./#alter", "icons": [{ "src": "icon-192.png", "sizes": "192x192" }] },
+    { "name": "تسعيرة الخدمات", "url": "./#services", "icons": [{ "src": "icon-192.png", "sizes": "192x192" }] }
+  ]
+}

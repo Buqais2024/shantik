@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>Shantik</title>
+<meta name="theme-color" content="#F7F2E9">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Shantik">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" href="favicon-32.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@1,500&family=Noto+Naskh+Arabic:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --cream:#F7F2E9; --paper:#FFFDF8; --gold:#8C6A2A; --gold-soft:#E9DEC8;
+    --ink:#4A3A1C; --muted:#8A7B62;
+    --top:env(safe-area-inset-top,0px); --bottom:env(safe-area-inset-bottom,0px);
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;height:100%;background:var(--cream);color:var(--ink);
+    font-family:"Noto Naskh Arabic",system-ui,sans-serif;overscroll-behavior:none}
+
+  /* ---------- Home menu ---------- */
+  #home{min-height:100%;display:flex;flex-direction:column;align-items:center;
+    padding:calc(var(--top) + 48px) 20px calc(var(--bottom) + 24px)}
+  .logo{width:96px;height:96px;border-radius:50%;border:1.5px solid var(--gold);
+    display:grid;place-items:center;font:italic 500 64px/1 "Cormorant Garamond",serif;color:var(--gold)}
+  h1{font:italic 500 38px/1 "Cormorant Garamond",serif;color:var(--gold);margin:16px 0 4px;letter-spacing:.5px}
+  .sub{color:var(--muted);font-size:15px;margin:0 0 36px}
+  .cards{width:100%;max-width:420px;display:grid;gap:14px}
+  .card{display:flex;align-items:center;gap:14px;width:100%;padding:18px;border-radius:16px;
+    background:var(--paper);border:1px solid var(--gold-soft);color:var(--ink);text-align:right;
+    font:600 18px "Noto Naskh Arabic",sans-serif;cursor:pointer;transition:transform .12s}
+  .card:active{transform:scale(.98)}
+  .card .ic{flex:none;width:46px;height:46px;border-radius:12px;background:var(--gold);
+    color:var(--paper);display:grid;place-items:center;font-size:22px}
+  .card small{display:block;font-weight:400;font-size:14px;color:var(--muted);margin-top:2px}
+  .foot{margin-top:auto;padding-top:32px;color:var(--muted);font-size:12px}
+
+  /* ---------- App view ---------- */
+  #view{position:fixed;inset:0;display:none;flex-direction:column;background:var(--cream)}
+  #view.on{display:flex}
+  .bar{flex:none;display:flex;align-items:center;gap:8px;
+    padding:calc(var(--top) + 6px) 10px 6px;background:var(--cream);border-bottom:1px solid var(--gold-soft)}
+  .bar button{border:0;background:none;color:var(--gold);font:600 16px "Noto Naskh Arabic",sans-serif;
+    padding:8px 10px;border-radius:10px;cursor:pointer}
+  .bar button:active{background:var(--gold-soft)}
+  .bar .t{flex:1;text-align:center;font-weight:600;font-size:16px}
+  .frame-wrap{position:relative;flex:1}
+  iframe{position:absolute;inset:0;width:100%;height:100%;border:0;background:var(--paper)}
+  .loader{position:absolute;inset:0;display:grid;place-items:center;background:var(--cream);transition:opacity .25s}
+  .loader.hide{opacity:0;pointer-events:none}
+  .spin{width:34px;height:34px;border-radius:50%;border:3px solid var(--gold-soft);border-top-color:var(--gold);
+    animation:s 0.9s linear infinite}
+  @keyframes s{to{transform:rotate(360deg)}}
+
+  /* ---------- Offline ---------- */
+  #offline{position:fixed;left:16px;right:16px;bottom:calc(var(--bottom) + 16px);display:none;
+    background:var(--gold);color:var(--paper);padding:12px 16px;border-radius:12px;text-align:center;font-size:15px}
+  #offline.on{display:block}
+</style>
+</head>
+<body>
+
+<section id="home">
+  <div class="logo">S</div>
+  <h1>Shantik</h1>
+  <p class="sub">حاسبة الأسعار</p>
+  <div class="cards" id="cards"></div>
+  <div class="foot" id="ver"></div>
+</section>
+
+<section id="view">
+  <div class="bar">
+    <button id="back" aria-label="Back">→ الرئيسية</button>
+    <div class="t" id="title"></div>
+    <button id="reload" aria-label="Reload">↻</button>
+  </div>
+  <div class="frame-wrap">
+    <iframe id="app" title="Shantik app"
+      allow="web-share; clipboard-write; clipboard-read"
+      referrerpolicy="no-referrer-when-downgrade"></iframe>
+    <div class="loader" id="loader"><div class="spin"></div></div>
+  </div>
+</section>
+
+<div id="offline">لا يوجد اتصال بالإنترنت — الحاسبة تحتاج اتصال</div>
+
+<script>
+/* =========================================================
+   CONFIG — paste your Google Apps Script /exec URLs here.
+   Get it from: Apps Script → Deploy → Manage deployments → Web app URL
+   ========================================================= */
+const GAS_URL = "https://script.google.com/macros/s/AKfycbxHrQGsltL5Rikal6C3o66ZO9zFFsykprI4TKx72kBwYWWyO1bW-WlPo-t_7b-5xJOuZQ/exec";
+
+const APPS = [
+  { id:"alter",    icon:"✂\uFE0E",  title:"تسعيرة التطريز",   desc:"عرض سعر تطريز وخياطة",  url: GAS_URL },
+  { id:"services", icon:"✦\uFE0E",  title:"تسعيرة الخدمات",   desc:"طباعة وتطريز وخدمات",   url: GAS_URL + "?page=services" },
+];
+const VERSION = "v1";
+/* ========================================================= */
+
+const $ = id => document.getElementById(id);
+const frame = $("app"), loader = $("loader");
+let current = null;
+
+$("ver").textContent = "Shantik " + VERSION;
+$("cards").innerHTML = APPS.map(a => `
+  <button class="card" data-id="${a.id}">
+    <span class="ic">${a.icon}</span>
+    <span>${a.title}<small>${a.desc}</small></span>
+  </button>`).join("");
+$("cards").addEventListener("click", e => {
+  const b = e.target.closest(".card"); if (b) open(b.dataset.id, true);
+});
+
+function open(id, push){
+  const a = APPS.find(x => x.id === id); if (!a) return;
+  current = a;
+  $("title").textContent = a.title;
+  loader.classList.remove("hide");
+  frame.src = a.url;
+  $("home").style.display = "none";
+  $("view").classList.add("on");
+  if (push) history.pushState({id}, "", "#" + id);
+}
+function home(push){
+  current = null;
+  $("view").classList.remove("on");
+  $("home").style.display = "";
+  frame.src = "about:blank";
+  if (push) history.pushState({}, "", location.pathname);
+}
+frame.addEventListener("load", () => loader.classList.add("hide"));
+$("back").onclick = () => history.length > 1 ? history.back() : home(true);
+$("reload").onclick = () => current && open(current.id, false);
+window.addEventListener("popstate", e => {
+  const id = (e.state && e.state.id) || location.hash.slice(1);
+  id ? open(id, false) : home(false);
+});
+
+// Deep link: /#services opens straight into that app
+if (location.hash) open(location.hash.slice(1), false);
+
+// Offline banner
+const net = () => $("offline").classList.toggle("on", !navigator.onLine);
+addEventListener("online", net); addEventListener("offline", net); net();
+
+// Service worker
+if ("serviceWorker" in navigator) {
+  addEventListener("load", () => navigator.serviceWorker.register("sw.js"));
+}
+</script>
+</body>
+</html>
