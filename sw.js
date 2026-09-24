@@ -3,7 +3,7 @@
 // - Google Fonts: cached so the app looks right offline.
 // - Apps Script API calls are never cached (always live).
 // Bump VERSION whenever you change index.html so phones pick it up.
-const VERSION = "shantik-v2";
+const VERSION = "shantik-v3";
 const SHELL = ["./", "./index.html", "./manifest.webmanifest",
   "./icon-192.png", "./icon-512.png", "./icon-maskable-512.png",
   "./apple-touch-icon.png", "./favicon-32.png"];
