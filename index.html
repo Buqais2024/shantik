@@ -1,159 +1,2147 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="en" dir="ltr">
 <head>
-<meta charset="utf-8">
+<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <title>Shantik</title>
-<meta name="theme-color" content="#F7F2E9">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="Shantik">
-<link rel="manifest" href="manifest.webmanifest">
-<link rel="icon" type="image/png" href="favicon-32.png">
-<link rel="apple-touch-icon" href="apple-touch-icon.png">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@1,500&family=Noto+Naskh+Arabic:wght@400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@1,400;1,600&family=DM+Sans:wght@300;400&family=Noto+Naskh+Arabic:wght@400;500&display=swap" rel="stylesheet">
 <style>
-  :root{
-    --cream:#F7F2E9; --paper:#FFFDF8; --gold:#8C6A2A; --gold-soft:#E9DEC8;
-    --ink:#4A3A1C; --muted:#8A7B62;
-    --top:env(safe-area-inset-top,0px); --bottom:env(safe-area-inset-bottom,0px);
-  }
-  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-  html,body{margin:0;height:100%;background:var(--cream);color:var(--ink);
-    font-family:"Noto Naskh Arabic",system-ui,sans-serif;overscroll-behavior:none}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --gold:      #C9A84C;
+  --gold-deep: #A8832A;
+  --gold-pale: #F0E0B0;
+  --gold-tint: #FAF4E6;
+  --obsidian:  #1A1A1A;
+  --charcoal:  #3A3A3A;
+  --smoke:     #888888;
+  --ivory:     #FDFAF5;
+  --radius:    8px;
+  --f-display: 'Cormorant Garamond', serif;
+  --f-body:    'DM Sans', sans-serif;
+  --f-arabic:  'Noto Naskh Arabic', serif;
+}
+html, body {
+  background: var(--ivory); color: var(--obsidian);
+  font-family: var(--f-body); font-weight: 300;
+  font-size: 15px; line-height: 1.5;
+  -webkit-text-size-adjust: 100%;
+}
+body.ar { font-family: var(--f-arabic); }
 
-  /* ---------- Home menu ---------- */
-  #home{min-height:100%;display:flex;flex-direction:column;align-items:center;
-    padding:calc(var(--top) + 48px) 20px calc(var(--bottom) + 24px)}
-  .logo{width:96px;height:96px;border-radius:50%;border:1.5px solid var(--gold);
-    display:grid;place-items:center;font:italic 500 64px/1 "Cormorant Garamond",serif;color:var(--gold)}
-  h1{font:italic 500 38px/1 "Cormorant Garamond",serif;color:var(--gold);margin:16px 0 4px;letter-spacing:.5px}
-  .sub{color:var(--muted);font-size:15px;margin:0 0 36px}
-  .cards{width:100%;max-width:420px;display:grid;gap:14px}
-  .card{display:flex;align-items:center;gap:14px;width:100%;padding:18px;border-radius:16px;
-    background:var(--paper);border:1px solid var(--gold-soft);color:var(--ink);text-align:right;
-    font:600 18px "Noto Naskh Arabic",sans-serif;cursor:pointer;transition:transform .12s}
-  .card:active{transform:scale(.98)}
-  .card .ic{flex:none;width:46px;height:46px;border-radius:12px;background:var(--gold);
-    color:var(--paper);display:grid;place-items:center;font-size:22px}
-  .card small{display:block;font-weight:400;font-size:14px;color:var(--muted);margin-top:2px}
-  .foot{margin-top:auto;padding-top:32px;color:var(--muted);font-size:12px}
+/* ══ Loading Overlay ══ */
+.loading-overlay {
+  display: none;
+  position: fixed; inset: 0; z-index: 9999;
+  background: rgba(253, 250, 245, 0.92);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+  flex-direction: column; align-items: center; justify-content: center;
+  gap: 20px;
+}
+.loading-overlay.show { display: flex; }
+.loading-inner {
+  position: relative;
+  width: 160px; height: 160px;
+  display: flex; align-items: center; justify-content: center;
+}
+.loading-circle {
+  position: absolute;
+  width: 150px; height: 150px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255,255,255,0.95) 40%, rgba(255,255,255,0.55) 70%, rgba(255,255,255,0) 100%);
+  animation: loading-pulse 1.8s ease-in-out infinite;
+}
+@keyframes loading-pulse {
+  0%, 100% { transform: scale(0.92); opacity: 0.75; }
+  50%       { transform: scale(1.08); opacity: 1; }
+}
+.loading-gif {
+  position: relative; z-index: 2;
+  width: 120px; height: auto;
+  display: block;
+}
+.loading-text {
+  font-family: var(--f-display);
+  font-style: italic;
+  font-size: 20px;
+  color: var(--gold-deep);
+  letter-spacing: 0.04em;
+  text-align: center;
+  min-height: 26px;
+}
+.ar .loading-text { font-family: var(--f-arabic); font-style: normal; font-size: 18px; }
 
-  /* ---------- App view ---------- */
-  #view{position:fixed;inset:0;display:none;flex-direction:column;background:var(--cream)}
-  #view.on{display:flex}
-  .bar{flex:none;display:flex;align-items:center;gap:8px;
-    padding:calc(var(--top) + 6px) 10px 6px;background:var(--cream);border-bottom:1px solid var(--gold-soft)}
-  .bar button{border:0;background:none;color:var(--gold);font:600 16px "Noto Naskh Arabic",sans-serif;
-    padding:8px 10px;border-radius:10px;cursor:pointer}
-  .bar button:active{background:var(--gold-soft)}
-  .bar .t{flex:1;text-align:center;font-weight:600;font-size:16px}
-  .frame-wrap{position:relative;flex:1}
-  iframe{position:absolute;inset:0;width:100%;height:100%;border:0;background:var(--paper)}
-  .loader{position:absolute;inset:0;display:grid;place-items:center;background:var(--cream);transition:opacity .25s}
-  .loader.hide{opacity:0;pointer-events:none}
-  .spin{width:34px;height:34px;border-radius:50%;border:3px solid var(--gold-soft);border-top-color:var(--gold);
-    animation:s 0.9s linear infinite}
-  @keyframes s{to{transform:rotate(360deg)}}
+/* ── Lang bar ── */
+.lang-bar {
+  background: var(--obsidian); padding: 10px 16px;
+  display: flex; align-items: center; justify-content: flex-end; gap: 6px;
+  position: sticky; top: 0; z-index: 100;
+}
+.lang-btn {
+  background: transparent; border: 1.5px solid var(--smoke);
+  border-radius: 20px; padding: 5px 14px; font-size: 12px;
+  color: var(--smoke); cursor: pointer; font-family: var(--f-body);
+  transition: all 0.15s; -webkit-tap-highlight-color: transparent; letter-spacing: 0.06em;
+}
+.lang-btn.active { background: var(--gold); border-color: var(--gold); color: var(--obsidian); font-weight: 400; }
 
-  /* ---------- Offline ---------- */
-  #offline{position:fixed;left:16px;right:16px;bottom:calc(var(--bottom) + 16px);display:none;
-    background:var(--gold);color:var(--paper);padding:12px 16px;border-radius:12px;text-align:center;font-size:15px}
-  #offline.on{display:block}
+/* ── Layout ── */
+.app-wrap { width: 100%; max-width: 100%; padding: 16px; padding-bottom: 48px; }
+.section-label {
+  font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--smoke); margin-bottom: 12px; padding-bottom: 6px;
+  border-bottom: 1px solid var(--gold-pale);
+}
+.ar .section-label { letter-spacing: 0; font-size: 12px; text-transform: none; }
+
+/* ── Card ── */
+.card {
+  background: #fff; border: 1px solid var(--gold-pale);
+  border-radius: var(--radius); padding: 16px; margin-bottom: 14px;
+  position: relative;
+}
+
+/* ── Locked card overlay ── */
+.card.locked { background: #fafafa; }
+.card.locked .card-body { pointer-events: none; opacity: 0.5; }
+.card-locked-summary {
+  display: none; padding: 4px 0 8px;
+}
+.card.locked .card-locked-summary { display: block; }
+.card.locked .card-body-inner { display: none; }
+.locked-label {
+  font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--smoke); margin-bottom: 2px;
+}
+.ar .locked-label { letter-spacing: 0; font-size: 12px; text-transform: none; }
+.locked-desc { font-size: 14px; color: var(--obsidian); }
+.ar .locked-desc { font-family: var(--f-arabic); font-size: 15px; }
+.locked-price { font-size: 14px; color: var(--gold-deep); font-weight: 400; margin-top: 2px; }
+
+/* ── Kebab menu (⋯) ── */
+.card-menu-wrap {
+  position: absolute; top: 14px; inset-inline-end: 14px; z-index: 10;
+}
+.kebab-btn {
+  background: none; border: none; cursor: pointer; padding: 4px 8px;
+  font-size: 18px; color: var(--smoke); line-height: 1;
+  -webkit-tap-highlight-color: transparent; border-radius: 4px;
+  transition: background 0.12s;
+}
+.kebab-btn:hover, .kebab-btn:focus { background: var(--gold-tint); color: var(--obsidian); outline: none; }
+.kebab-menu {
+  display: none; position: absolute; inset-inline-end: 0; top: 32px;
+  background: #fff; border: 1px solid var(--gold-pale); border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.10); min-width: 130px; overflow: hidden; z-index: 50;
+}
+.kebab-menu.open { display: block; }
+.kebab-item {
+  display: block; width: 100%; padding: 12px 16px; text-align: start;
+  background: none; border: none; font-size: 14px; font-family: var(--f-body);
+  cursor: pointer; color: var(--charcoal);
+  transition: background 0.12s; -webkit-tap-highlight-color: transparent;
+}
+.ar .kebab-item { font-family: var(--f-arabic); font-size: 15px; }
+.kebab-item:hover { background: var(--gold-tint); }
+.kebab-item.del { color: #c0392b; }
+
+/* ── Fields ── */
+.field { margin-bottom: 14px; }
+.field:last-child { margin-bottom: 0; }
+label {
+  display: block; font-size: 10px; letter-spacing: 0.1em;
+  text-transform: uppercase; color: var(--smoke); margin-bottom: 6px;
+}
+.ar label { letter-spacing: 0; font-size: 12px; text-transform: none; font-family: var(--f-arabic); }
+label .opt { font-size: 10px; color: #bbb; text-transform: none; letter-spacing: 0; font-style: italic; margin-inline-start: 4px; }
+input[type="text"], input[type="tel"], input[type="number"], select, textarea {
+  width: 100%; background: var(--ivory); border: 1px solid var(--gold-pale);
+  border-radius: 6px; padding: 13px 14px;
+  font-family: var(--f-body); font-weight: 300; font-size: 16px;
+  color: var(--obsidian); -webkit-appearance: none; appearance: none;
+  outline: none; transition: border-color 0.18s;
+}
+.ar input, .ar select, .ar textarea { font-family: var(--f-arabic); font-size: 16px; }
+select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23C9A84C' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 14px center; padding-right: 38px;
+}
+.ar select { background-position: left 14px center; padding-right: 14px; padding-left: 38px; }
+input:focus, select:focus, textarea:focus { border-color: var(--gold); background: #fff; }
+textarea { resize: vertical; min-height: 60px; }
+.row-2 { display: flex; gap: 10px; }
+.row-2 .field { flex: 1; margin-bottom: 0; }
+
+/* ── Price row ── */
+.price-row {
+  display: flex; align-items: center; gap: 8px;
+  margin-top: 10px; padding: 10px 12px;
+  background: var(--gold-tint); border: 1px solid var(--gold-pale); border-radius: 6px;
+}
+.price-row label { margin: 0; flex-shrink: 0; font-size: 10px; color: var(--smoke); white-space: nowrap; }
+.ar .price-row label { font-family: var(--f-arabic); font-size: 12px; }
+.price-row input[type="number"] {
+  background: #fff; border: 1px solid var(--gold-pale); border-radius: 4px;
+  padding: 8px 10px; font-size: 16px; color: var(--gold-deep);
+  font-weight: 400; flex: 1; min-width: 0; text-align: right;
+}
+.price-row .currency { font-size: 11px; color: var(--smoke); flex-shrink: 0; }
+.price-row .line-total { font-size: 13px; color: var(--gold-deep); font-weight: 400; white-space: nowrap; flex-shrink: 0; }
+
+/* ── Service / toggle tabs ── */
+.svc-tabs { display: flex; border: 1px solid var(--gold-pale); border-radius: 6px; overflow: hidden; margin-bottom: 14px; }
+.svc-tab {
+  flex: 1; padding: 11px 4px; text-align: center; font-size: 12px;
+  color: var(--smoke); cursor: pointer; background: var(--ivory);
+  border: none; font-family: var(--f-body); line-height: 1.3;
+  transition: background 0.15s, color 0.15s; -webkit-tap-highlight-color: transparent;
+}
+.ar .svc-tab { font-family: var(--f-arabic); font-size: 13px; }
+.svc-tab.active { background: var(--obsidian); color: var(--gold); }
+.toggle-tabs { display: flex; border: 1px solid var(--gold-pale); border-radius: 6px; overflow: hidden; margin-bottom: 12px; }
+.toggle-tab {
+  flex: 1; padding: 11px 8px; text-align: center; font-size: 13px;
+  color: var(--smoke); cursor: pointer; background: var(--ivory);
+  border: none; font-family: var(--f-body);
+  transition: background 0.15s, color 0.15s; -webkit-tap-highlight-color: transparent;
+}
+.ar .toggle-tab { font-family: var(--f-arabic); font-size: 14px; }
+.toggle-tab.active { background: var(--obsidian); color: var(--gold); }
+
+/* ── Slider ── */
+.slider-wrap { position: relative; padding-bottom: 8px; }
+input[type="range"] {
+  -webkit-appearance: none; appearance: none; width: 100%;
+  height: 4px; border-radius: 2px; background: var(--gold-pale); outline: none; margin: 18px 0 0;
+}
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none; appearance: none;
+  width: 32px; height: 32px; border-radius: 50%;
+  background: var(--obsidian); border: 2px solid var(--gold); cursor: pointer;
+}
+.slider-value { position: absolute; top: 0; font-size: 12px; color: var(--gold); font-weight: 400; pointer-events: none; transform: translateX(-50%); transition: left 0.1s; }
+.slider-labels { display: flex; justify-content: space-between; font-size: 10px; color: #ccc; margin-top: 4px; }
+
+/* ── Checkbox ── */
+.checkbox-row {
+  display: flex; align-items: center; gap: 10px;
+  cursor: pointer; -webkit-tap-highlight-color: transparent; margin-bottom: 12px;
+}
+.checkbox-row:last-child { margin-bottom: 0; }
+.checkbox-row input[type="checkbox"] {
+  width: 22px; height: 22px; border: 1.5px solid var(--gold-pale);
+  border-radius: 4px; -webkit-appearance: none; appearance: none;
+  background: var(--ivory); cursor: pointer; flex-shrink: 0; position: relative;
+  transition: background 0.15s, border-color 0.15s;
+}
+.checkbox-row input[type="checkbox"]:checked { background: var(--obsidian); border-color: var(--gold); }
+.checkbox-row input[type="checkbox"]:checked::after {
+  content: ''; position: absolute; left: 6px; top: 3px;
+  width: 6px; height: 10px; border: 2px solid var(--gold);
+  border-top: none; border-left: none; transform: rotate(45deg);
+}
+.checkbox-label { font-size: 15px; color: var(--charcoal); }
+.ar .checkbox-label { font-family: var(--f-arabic); font-size: 16px; }
+
+/* ── Buttons ── */
+.btn {
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  width: 100%; padding: 16px; border-radius: var(--radius); border: none;
+  font-family: var(--f-body); font-size: 15px; font-weight: 400;
+  cursor: pointer; -webkit-tap-highlight-color: transparent;
+  transition: opacity 0.15s, transform 0.1s; margin-bottom: 10px; letter-spacing: 0.04em;
+}
+.ar .btn { font-family: var(--f-arabic); font-size: 16px; letter-spacing: 0; }
+.btn:active { transform: scale(0.98); opacity: 0.88; }
+.btn:last-child { margin-bottom: 0; }
+.btn-calc { background: var(--obsidian); color: var(--gold); border: 1.5px solid var(--gold); }
+.btn-add  { background: transparent; color: var(--charcoal); border: 1.5px dashed var(--gold-pale); font-size: 14px; }
+.btn-pdf  { background: var(--gold); color: var(--obsidian); }
+.btn-wa   { background: #25D366; color: #fff; }
+.btn-wa-tap {
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  width: 100%; padding: 18px; border-radius: var(--radius);
+  border: 3px solid #25D366; background: #fff; color: #128C7E;
+  font-family: var(--f-body); font-size: 15px; font-weight: 400;
+  cursor: pointer; margin-bottom: 10px; letter-spacing: 0.04em;
+  -webkit-tap-highlight-color: transparent;
+  animation: pulse-green 1.4s ease-in-out infinite;
+}
+.ar .btn-wa-tap { font-family: var(--f-arabic); font-size: 16px; }
+@keyframes pulse-green {
+  0%,100% { box-shadow: 0 0 0 0 rgba(37,211,102,0.5); }
+  50%      { box-shadow: 0 0 0 10px rgba(37,211,102,0); }
+}
+.btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+/* ── Total block ── */
+.total-block { background: var(--obsidian); border-radius: var(--radius); padding: 20px 18px; margin-bottom: 14px; display: none; }
+.total-block.visible { display: block; }
+.total-label { font-size: 10px; color: var(--smoke); letter-spacing: 0.14em; text-transform: uppercase; margin-bottom: 4px; }
+.ar .total-label { font-family: var(--f-arabic); letter-spacing: 0; font-size: 12px; }
+.total-amount { font-family: var(--f-display); font-style: italic; font-size: 42px; color: var(--gold); line-height: 1; }
+.total-currency { font-size: 15px; color: var(--smoke); margin-inline-start: 4px; }
+.total-vat { font-size: 12px; color: var(--smoke); margin-top: 6px; }
+.ar .total-vat { font-family: var(--f-arabic); }
+
+/* ── Messages ── */
+.msg { padding: 12px 14px; border-radius: 6px; font-size: 13px; margin-bottom: 12px; display: none; }
+.msg.visible { display: block; }
+.msg-error   { background: #fff0f0; color: #c0392b; border: 1px solid #f5c6c6; }
+.msg-success { background: var(--gold-tint); color: var(--gold-deep); border: 1px solid var(--gold-pale); }
+.ar .msg { font-family: var(--f-arabic); font-size: 14px; }
+
+/* ── Spinner ── */
+.spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.3); border-top-color: currentColor; border-radius: 50%; animation: spin 0.7s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── Misc ── */
+.phone-hint { font-size: 11px; color: var(--smoke); margin-top: 4px; min-height: 15px; }
+.phone-hint.ok { color: #27ae60; } .phone-hint.err { color: #e05; }
+.ar .phone-hint { font-family: var(--f-arabic); font-size: 12px; }
+.item-num { font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--smoke); margin-bottom: 12px; display: block; }
+.ar .item-num { font-family: var(--f-arabic); letter-spacing: 0; font-size: 12px; }
+.estimate-note { font-size: 11px; color: var(--smoke); margin-top: 5px; font-style: italic; }
+.ar .estimate-note { font-family: var(--f-arabic); font-size: 12px; font-style: normal; }
+/* ── Calculate from Sheet button ── */
+.btn-calc-sheet {
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  width: 100%; padding: 13px; border-radius: 6px;
+  border: 1.5px solid var(--gold); background: var(--obsidian); color: var(--gold);
+  font-family: var(--f-body); font-size: 14px; font-weight: 400;
+  cursor: pointer; margin: 4px 0 8px; letter-spacing: 0.03em;
+  -webkit-tap-highlight-color: transparent; transition: opacity 0.15s, transform 0.1s;
+}
+.ar .btn-calc-sheet { font-family: var(--f-arabic); font-size: 15px; }
+.btn-calc-sheet:active { transform: scale(0.98); opacity: 0.88; }
+.btn-calc-sheet:disabled { opacity: 0.5; cursor: not-allowed; }
+.sheet-status { font-size: 12px; margin: 0 0 8px; min-height: 16px; }
+.sheet-status.ok  { color: #27ae60; }
+.sheet-status.err { color: #e05; }
+.sheet-status.loading { color: var(--smoke); }
+.ar .sheet-status { font-family: var(--f-arabic); font-size: 13px; }
+/* ── Modal ── */
+.modal-overlay { display:none; position:fixed; inset:0; z-index:200; background:rgba(0,0,0,0.55); align-items:center; justify-content:center; padding:24px; }
+.modal-overlay.open { display:flex; }
+.modal { background:#fff; border-radius:12px; padding:24px 20px; width:100%; max-width:360px; box-shadow:0 8px 40px rgba(0,0,0,0.18); animation:slideUp 0.2s ease; }
+@keyframes slideUp { from{transform:translateY(20px);opacity:0;} to{transform:translateY(0);opacity:1;} }
+.modal-title { font-family:var(--f-display); font-style:italic; font-size:22px; color:var(--obsidian); margin-bottom:6px; }
+.modal-sub { font-size:12px; color:var(--smoke); margin-bottom:18px; }
+.doc-choice-row { display:flex; gap:10px; margin-bottom:16px; }
+.doc-choice { flex:1; border:1.5px solid var(--gold-pale); border-radius:8px; padding:14px 10px; text-align:center; cursor:pointer; background:var(--ivory); transition:all 0.15s; -webkit-tap-highlight-color:transparent; }
+.doc-choice.selected { border-color:var(--gold); background:var(--gold-tint); }
+.doc-icon { font-size:24px; margin-bottom:6px; }
+.doc-name { font-size:13px; color:var(--obsidian); }
+.doc-name-ar { font-size:11px; color:var(--smoke); margin-top:2px; font-family:var(--f-arabic); }
+.invoice-extra { display:none; margin-bottom:14px; }
+.invoice-extra.visible { display:block; }
+.modal-field { margin-bottom:12px; }
+.modal-field label { display:block; font-size:10px; letter-spacing:0.1em; text-transform:uppercase; color:var(--smoke); margin-bottom:6px; }
+.ar .modal-field label { font-family:var(--f-arabic); letter-spacing:0; font-size:12px; text-transform:none; }
+.modal-field input { width:100%; background:var(--ivory); border:1px solid var(--gold-pale); border-radius:6px; padding:12px 14px; font-family:var(--f-body); font-size:16px; color:var(--obsidian); -webkit-appearance:none; outline:none; }
+.modal-actions { display:flex; gap:10px; margin-top:4px; }
+.modal-btn { flex:1; padding:14px; border-radius:8px; border:none; font-family:var(--f-body); font-size:14px; cursor:pointer; -webkit-tap-highlight-color:transparent; }
+.ar .modal-btn { font-family:var(--f-arabic); font-size:15px; }
+.modal-btn-cancel { background:var(--ivory); border:1px solid var(--gold-pale); color:var(--smoke); }
+.modal-btn-go { background:var(--obsidian); color:var(--gold); }
+
+/* ── Top actions ── */
+.top-actions { display:flex; gap:8px; margin-bottom:16px; }
+.top-action-btn {
+  flex:1; padding:11px 8px; border-radius:8px;
+  border:1.5px solid var(--gold-pale); background:#fff; color:var(--charcoal);
+  font-family:var(--f-body); font-size:12px; cursor:pointer; line-height:1.3;
+  -webkit-tap-highlight-color:transparent; transition:all 0.15s;
+}
+.ar .top-action-btn { font-family:var(--f-arabic); font-size:13px; }
+.top-action-btn:active { transform:scale(0.98); background:var(--gold-tint); }
+
+/* ── Editing banner ── */
+.editing-banner {
+  display:flex; align-items:center; justify-content:space-between;
+  background:var(--gold-tint); border:1px solid var(--gold); border-radius:8px;
+  padding:10px 14px; margin-bottom:14px; font-size:13px; color:var(--gold-deep);
+}
+.ar .editing-banner { font-family:var(--f-arabic); font-size:14px; }
+.editing-banner-clear { background:none; border:none; color:var(--gold-deep); font-size:16px; cursor:pointer; padding:2px 6px; -webkit-tap-highlight-color:transparent; }
+
+/* ── Records modal ── */
+.modal-lg { max-width:440px; max-height:85vh; display:flex; flex-direction:column; }
+.records-search { width:100%; margin-bottom:10px; padding:11px 14px; border:1px solid var(--gold-pale); border-radius:6px; font-family:var(--f-body); font-size:16px; -webkit-appearance:none; outline:none; }
+.ar .records-search { font-family:var(--f-arabic); }
+.records-search:focus { border-color:var(--gold); }
+.records-sortrow { display:flex; gap:8px; margin-bottom:12px; }
+.records-sortrow select { flex:1; padding:9px 12px; border:1px solid var(--gold-pale); border-radius:6px; font-family:var(--f-body); font-size:13px; -webkit-appearance:none; background:var(--ivory); outline:none; }
+.ar .records-sortrow select { font-family:var(--f-arabic); }
+.records-list { flex:1; overflow-y:auto; margin:0 -4px; padding:0 4px; min-height:120px; }
+.record-row {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:12px; border:1px solid var(--gold-pale); border-radius:8px;
+  margin-bottom:8px; cursor:pointer; transition:all 0.12s;
+  -webkit-tap-highlight-color:transparent;
+}
+.record-row:active { background:var(--gold-tint); }
+.record-info { flex:1; min-width:0; }
+.record-ref { font-size:13px; color:var(--obsidian); font-weight:400; }
+.record-meta { font-size:11px; color:var(--smoke); margin-top:2px; }
+.ar .record-meta { font-family:var(--f-arabic); }
+.record-badge { font-size:9px; padding:2px 7px; border-radius:10px; letter-spacing:0.04em; text-transform:uppercase; flex-shrink:0; margin-inline-start:8px; }
+.record-badge.quote { background:#e8f4ea; color:#1D6B38; }
+.record-badge.invoice { background:var(--gold-tint); color:var(--gold-deep); }
+.records-empty { text-align:center; color:var(--smoke); padding:30px 10px; font-size:13px; }
+.ar .records-empty { font-family:var(--f-arabic); }
+.records-pager { display:flex; align-items:center; justify-content:space-between; margin-top:10px; padding-top:10px; border-top:1px solid var(--gold-pale); }
+.pager-btn { padding:8px 16px; border:1px solid var(--gold-pale); border-radius:6px; background:#fff; color:var(--charcoal); font-family:var(--f-body); font-size:13px; cursor:pointer; -webkit-tap-highlight-color:transparent; }
+.ar .pager-btn { font-family:var(--f-arabic); }
+.pager-btn:disabled { opacity:0.4; cursor:not-allowed; }
+.pager-info { font-size:12px; color:var(--smoke); }
+.ar .pager-info { font-family:var(--f-arabic); }
+
+/* ── Date picker ── */
+.datepick { max-width:340px; }
+.cal-typerow { display:flex; gap:8px; margin-bottom:14px; }
+.cal-typebtn { flex:1; padding:10px; border:1.5px solid var(--gold-pale); border-radius:6px; background:var(--ivory); color:var(--smoke); font-family:var(--f-body); font-size:13px; cursor:pointer; -webkit-tap-highlight-color:transparent; }
+.ar .cal-typebtn { font-family:var(--f-arabic); font-size:14px; }
+.cal-typebtn.active { background:var(--obsidian); color:var(--gold); border-color:var(--gold); }
+.cal-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; }
+.cal-nav { background:none; border:1px solid var(--gold-pale); border-radius:6px; width:34px; height:34px; cursor:pointer; color:var(--charcoal); font-size:16px; -webkit-tap-highlight-color:transparent; }
+.cal-monthlabel { font-size:15px; color:var(--obsidian); font-weight:400; }
+.ar .cal-monthlabel { font-family:var(--f-arabic); }
+.cal-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:2px; }
+.cal-dayname { text-align:center; font-size:10px; color:var(--smoke); padding:6px 0; font-weight:400; }
+.ar .cal-dayname { font-family:var(--f-arabic); font-size:11px; }
+.cal-day { text-align:center; padding:9px 0; font-size:13px; color:var(--charcoal); cursor:pointer; border-radius:6px; -webkit-tap-highlight-color:transparent; transition:background 0.1s; }
+.cal-day:active { background:var(--gold-tint); }
+.cal-day.empty { cursor:default; }
+.cal-day.selected { background:var(--gold); color:var(--obsidian); font-weight:400; }
+.cal-day.today { border:1px solid var(--gold); }
+.cal-preview { text-align:center; font-size:13px; color:var(--gold-deep); margin:14px 0 4px; min-height:18px; }
+.ar .cal-preview { font-family:var(--f-arabic); }
+</style>
+<!-- ══ PWA (installable app) ══ -->
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#1A1A1A">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Shantik">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" href="favicon-32.png">
+<style>
+/* PWA: keep content clear of the iPhone notch / home bar */
+.lang-bar { padding-top: calc(10px + env(safe-area-inset-top, 0px)); }
+body { padding-bottom: env(safe-area-inset-bottom, 0px); overscroll-behavior-y: none; }
+.pwa-offline { position: fixed; left: 12px; right: 12px; bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+  z-index: 99999; display: none; background: var(--obsidian); color: var(--gold-pale); border: 1px solid var(--gold);
+  border-radius: 10px; padding: 10px 14px; text-align: center; font-size: 13px; }
+.pwa-offline.on { display: block; }
+/* PWA: launch screen (Shantik monogram) */
+#pwaSplash { position: fixed; inset: 0; z-index: 100000; background: #FDFAF5; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; transition: opacity .45s ease; }
+#pwaSplash.hide { opacity: 0; pointer-events: none; }
+#pwaSplash svg { width: 132px; height: 132px; }
+#pwaSplash .ring-spin { transform-origin: 50px 50px; animation: pwaSpin 1.4s linear infinite; }
+#pwaSplash .mono { animation: pwaFadeO .9s ease both; }
+#pwaSplash .word { margin-top: 18px; font: italic 400 26px/1 'Cormorant Garamond', serif; color: #A8832A; letter-spacing: .08em; animation: pwaFade 1.2s ease both; }
+@keyframes pwaSpin { to { transform: rotate(360deg); } }
+@keyframes pwaFadeO { from { opacity: 0; } to { opacity: 1; } }
+@keyframes pwaFade { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+/* PWA: refresh button on the black bar */
+.pwa-refresh { margin-right: auto; width: 34px; height: 34px; border-radius: 50%; border: 1.5px solid var(--smoke);
+  background: transparent; color: var(--gold); display: flex; align-items: center; justify-content: center;
+  cursor: pointer; -webkit-tap-highlight-color: transparent; padding: 0; }
+.pwa-refresh:active { background: #2A2A2A; }
+.pwa-refresh svg { width: 17px; height: 17px; }
+.pwa-refresh.spin svg { animation: pwaSpin .8s linear infinite; }
+[dir="rtl"] .pwa-refresh, body.ar .pwa-refresh { margin-right: 0; margin-left: auto; }
 </style>
 </head>
 <body>
+<!-- ══ PWA launch screen ══ -->
+<div id="pwaSplash" aria-hidden="true">
+  <svg viewBox="0 0 100 100">
+    <circle cx="50" cy="50" r="44" fill="none" stroke="#F0E0B0" stroke-width="1.4"/>
+    <circle class="ring-spin" cx="50" cy="50" r="44" fill="none" stroke="#C9A84C" stroke-width="1.6" stroke-linecap="round" stroke-dasharray="60 217"/>
+    <path class="mono" fill="#A8832A" transform="translate(50 50) scale(0.078 -0.078) translate(-248.5 -312)" d="M186 -12Q152 -12 119 -4Q85 3 48 22Q44 25 43 30Q41 34 42 41L62 176Q62 181 68 181Q73 181 74 176Q78 128 94 90Q110 51 139 29Q168 7 211 7Q241 7 267 18Q293 30 312 55Q331 80 337 119Q346 164 331 196Q317 229 289 254Q261 278 230 300Q199 323 172 347Q144 371 129 403Q115 435 123 481Q133 533 165 568Q197 602 242 619Q286 636 332 636Q358 636 386 630Q414 625 443 612Q456 605 455 595L441 478Q441 475 435 475Q430 475 430 478Q425 515 412 547Q399 580 375 599Q351 619 312 619Q276 619 252 603Q229 587 215 563Q202 539 197 514Q190 473 204 444Q218 415 245 393Q272 370 302 348Q335 325 364 299Q394 274 410 240Q426 206 418 158Q410 111 380 73Q351 34 302 11Q254 -12 186 -12Z"/>
+  </svg>
+  <div class="word">Shantik</div>
+</div>
 
-<section id="home">
-  <div class="logo">S</div>
-  <h1>Shantik</h1>
-  <p class="sub">حاسبة الأسعار</p>
-  <div class="cards" id="cards"></div>
-  <div class="foot" id="ver"></div>
-</section>
-
-<section id="view">
-  <div class="bar">
-    <button id="back" aria-label="Back">→ الرئيسية</button>
-    <div class="t" id="title"></div>
-    <button id="reload" aria-label="Reload">↻</button>
+<!-- ══ Loading Overlay ══ -->
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="loading-inner">
+    <div class="loading-circle"></div>
+    <img class="loading-gif" src="data:image/gif;base64,R0lGODlhpQL0AvAAAAAAAAAAACH+KUdJRiBlZGl0ZWQgd2l0aCBodHRwczovL2V6Z2lmLmNvbS9lZmZlY3RzACH/C05FVFNDQVBFMi4wAwEAAAAh+QQFFAAAACwAAAAApQL0AgAC/4SPqcvtD6OctNqLs968+w+G4kiW5omm6sq27gvH8kzX9o3n+s73/g8MCofEovGITCqXzKbzCY1Kp9Sq9YrNarfcrvcLDovH5LL5jE6r1+y2+w2Py+f0uv2Oz+v3/L7/DxgoOEhYaHiImKi4yNjo+AgZKTlJWWl5iZmpucnZ6fkJGio6SlpqeoqaqrrK2ur6ChsrO0tba3uLm6u7y9vr+wscLDxMXGx8jJysvMzc7PwMHS09TV1tfY2drb3N3e39DR4uPk5ebn6Onq6+zt7u/g4fLz9PX29/j5+vv8/f7/8PMKDAgQQLGjyIMKHChQwbOnwIMaLEiRQrWryIMaPGjf8cO3r8CDKkyJEkS5o8iTKlypUsW7p8CTOmzJk0a9q8iTOnzp08e/r8CTSo0KFEixo9ijSp0qVMmzp9CjWq1KlUq1q9ijWr1q1cu3r9Cjas2LFky5o9izat2rVs27p9Czeu3Ll069q9izev3r18+/r9Cziw4MGECxs+jDix4sWMGzt+DDmy5MmUK1u+jDmz5s2cO3v+DDq06NGkS5s+jTq16tWsW7t+DTu27Nm0a9u+jTu37t28e/v+DTy48OHEixs/jjy58uXMmzt/Dj269OnUq1u/jj279u3cu3v/Dj68+PHky5s/jz69+vXs27t/Dz++/Pn069u/jz+//v38+/v//w9ggAIOSGCBBh6IYIIKLshggw4+CGGEEk5IYYUWXohhhhpuyGGHHn4IYogijkhiiSaeiGKKKq7IYosuvghjjDLOSGONNt6IY4467shjjz7+CGSQQg5JZJFGHolkkkouyWSTTj4JZZRSTklllVZeiWWWWm7JZZdefglmmGKOSWaZZp6JZppqrslmm26+CWeccs5JZ5123olnnnruyWeffv4JaKCCDkpooYYeimiiii7KaKOOPgpppJJOSmmlll6Kaaaabsppp55+Cmqooo5Kaqmmnopqqqquymqrrr4Ka6yyzkprrbbeimuuuu7Ka6++/gpssMIOS2yxxh6LbLLK/y7LbLPOPgtttNJOS2211l6Lbbbabsttt95+C2644o5Lbrnmnotuuuquy2677r4Lb7zyzktvvfbei2+++u7Lb7/+/gtwwAIPTHDBBh+McMIKL8xwww4/DHHEEk9MccUWX4xxxhpvzHHHHn8Mcsgij0xyySafjHLKKq/McssuvwxzzDLPTHPNNt+Mc84678xzzz7/DHTQQg9NdNFGH4100kovzXTTTj8NddRST0111VZfjXXWWm/Ndddefw122GKPTXbZZp+Ndtpqr812226/DXfccs9Nd91234133nrvzXfffv8NeOCCD0544YYfjnjiii/OeOOOPw555JJPTnnllnxfjnnmmm/Oeeeefw566KKPTnrppp+Oeuqqr856666/Dnvsss9Oe+2234577rrvznvvvv8OfPDCD0988cYfj3zyyi/PfPPOPw999NJPT3311l+Pffbab899995/D3744o9Pfvnmn49++uqvz3777r8Pf/zyz09//fbfr08BACH5BAkUAAAALMEBAAA2AH4AAAL/hI+pyxYPowytWjbzu7zr3IXNB4omQkrn6qQQe7oRbMobLdoU7tl8qPtxdDthJWi0IJOYJVPhfCai0pasuqBitVJu14dFeZljMjhsvaLTqfWhbITHz2v5z36nh4luAJ73R8PnFiiot3WIqFZXyNLomPgV+fS4UlkzSZlptoh2idnpGbq3mfSZM6ro0ueXqkrC2rraV2rqWnUr2caaq/sRKwvLOzu8W/wb26spnGx8XNLM/DwBzEYNTDytUu2s/cIt7X0DrlFt/U0OjV1uHrxtzg4fnz7T7o4u/56vTz/ert6vyL9r9gD2s3cO4T2FCxXy2+dvIL6C9RxOlBgRI8M0IBtldaxoUWDIjxkpikRYkmLHVitZrkz5ryVMeC391CwAACH5BAkUAAAALAAAAAClAvQCAAL/hI+py+0Po5y02ouz3rz7D4ZiF5TmiZbjyrbuC8fyTNf2jed3yp/6DwwKh8Si8YhMino9pfMJjUqn1KqVxORdt9yu9wsOiw9Z7fiMTqvX7PaijHLL5/S6/Q6Dx/H8vv8P6KbnE1hoeIiYGDSoouj4CBkpKcHYOHmJmamJV7np+QkaulUZIGp6ipqKQ6ra6voKi9EZS1tr+8p6q7vLi5nbCxws7Dc7bHyMjPabzNzsHFX8LD1N/RNdjZ2tvXS97f0NHtEdTl4Ovmyerl6Nvu7+fjwOP09v216Pn68q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" alt="loading">
   </div>
-  <div class="frame-wrap">
-    <iframe id="app" title="Shantik app"
-      allow="web-share; clipboard-write; clipboard-read"
-      referrerpolicy="no-referrer-when-downgrade"></iframe>
-    <div class="loader" id="loader"><div class="spin"></div></div>
+  <div class="loading-text" id="loadingText"></div>
+</div>
+
+<div class="lang-bar">
+  <button class="lang-btn active" id="btn-en" onclick="setLang('en')">EN</button>
+  <button class="lang-btn" id="btn-ar" onclick="setLang('ar')">عربي</button>
+</div>
+
+<div class="app-wrap" id="appWrap">
+
+  <!-- Top actions: edit existing / create invoice from quote -->
+  <div class="top-actions">
+    <button class="top-action-btn" onclick="openRecordsModal('edit')">
+      <span data-en="Edit Quote / Invoice" data-ar="تعديل عرض سعر / فاتورة">Edit Quote / Invoice</span>
+    </button>
+    <button class="top-action-btn" onclick="openRecordsModal('invFromQuote')">
+      <span data-en="Create Invoice from Quote" data-ar="إنشاء فاتورة من عرض سعر">Create Invoice from Quote</span>
+    </button>
   </div>
-</section>
 
-<div id="offline">لا يوجد اتصال بالإنترنت — الحاسبة تحتاج اتصال</div>
+  <!-- Editing banner (shown when editing an existing record) -->
+  <div class="editing-banner" id="editingBanner" style="display:none;">
+    <span id="editingBannerText"></span>
+    <button class="editing-banner-clear" onclick="clearEditing()">✕</button>
+  </div>
 
+  <div class="section-label" data-en="Client Details" data-ar="بيانات العميلة">Client Details</div>
+  <div class="card">
+    <div class="field">
+      <label data-en="Client Name" data-ar="اسم العميلة">Client Name</label>
+      <input type="text" id="clientName" data-ph-en="e.g. Norrah Al-Otaibi" data-ph-ar="مثال: نورة العتيبي" placeholder="e.g. Norrah Al-Otaibi">
+    </div>
+    <div class="field">
+      <label><span data-en="Phone Number" data-ar="رقم الجوال">Phone Number</span> <span class="opt" data-en="optional" data-ar="اختياري">optional</span></label>
+      <input type="tel" id="phone" placeholder="05XXXXXXXX" inputmode="tel" maxlength="10">
+      <div class="phone-hint" id="phoneHint"></div>
+    </div>
+    <div class="field">
+      <label><span data-en="Notes" data-ar="ملاحظات">Notes</span> <span class="opt" data-en="optional" data-ar="اختياري">optional</span></label>
+      <textarea id="generalNotes" data-ph-en="e.g. Wedding occasion, prefers cream tones" data-ph-ar="مثال: مناسبة زفاف، تفضل الألوان الكريمية" placeholder="e.g. Wedding occasion, prefers cream tones"></textarea>
+    </div>
+    <div class="row-2">
+      <div class="field">
+        <label><span data-en="Occasion" data-ar="المناسبة">Occasion</span> <span class="opt" data-en="optional" data-ar="اختياري">optional</span></label>
+        <input type="text" id="occasion" data-ph-en="e.g. Wedding" data-ph-ar="مثال: زفاف" placeholder="e.g. Wedding">
+      </div>
+      <div class="field">
+        <label><span data-en="Delivery Date" data-ar="تاريخ التسليم">Delivery Date</span> <span class="opt" data-en="optional" data-ar="اختياري">optional</span></label>
+        <input type="text" id="deliveryDate" readonly onclick="openDatePicker()" style="cursor:pointer;" data-ph-en="Tap to pick a date" data-ph-ar="اضغط لاختيار التاريخ" placeholder="Tap to pick a date">
+      </div>
+    </div>
+  </div>
+
+  <div class="section-label" data-en="Services" data-ar="الخدمات">Services</div>
+  <div id="itemsContainer"></div>
+  <button class="btn btn-add" id="addItemBtn" onclick="addItem()">
+    + <span data-en="Add Another Service" data-ar="إضافة خدمة أخرى">Add Another Service</span>
+  </button>
+
+  <div class="card" style="margin-top:14px;">
+    <label class="checkbox-row">
+      <input type="checkbox" id="applyDiscount" onchange="updateLiveTotal()">
+      <span class="checkbox-label" data-en="Apply discount" data-ar="تطبيق الخصم">Apply discount</span>
+    </label>
+    <label class="checkbox-row">
+      <input type="checkbox" id="applyVAT" onchange="updateLiveTotal()">
+      <span class="checkbox-label" data-en="Apply VAT (15%)" data-ar="تطبيق ضريبة القيمة المضافة (15%)">Apply VAT (15%)</span>
+    </label>
+  </div>
+
+  <button class="btn btn-calc" id="calcBtn" onclick="buildTotal()">
+    <span data-en="Confirmation" data-ar="تأكيد">Confirmation</span>
+  </button>
+
+  <div class="total-block" id="totalBlock">
+    <div class="total-label" data-en="Total" data-ar="الإجمالي">Total</div>
+    <div>
+      <span class="total-amount" id="totalAmount">0.00</span>
+      <span class="total-currency">SAR</span>
+    </div>
+    <div class="total-vat" id="totalVatNote"></div>
+  </div>
+
+  <div class="msg msg-error" id="errorMsg"></div>
+  <div class="msg msg-success" id="successMsg"></div>
+
+  <button class="btn btn-pdf" id="pdfBtn" onclick="openDocModal('download')" disabled>
+    <span data-en="Download PDF" data-ar="تحميل PDF">Download PDF</span>
+  </button>
+  <button class="btn btn-wa" id="waBtn" onclick="openDocModal('whatsapp')" disabled>
+    <span data-en="Share via WhatsApp" data-ar="مشاركة عبر واتساب">Share via WhatsApp</span>
+  </button>
+  <button class="btn-wa-tap" id="waTapBtn" onclick="tapToShare()" style="display:none;">
+    📎 <span data-en="Tap to Share PDF" data-ar="اضغط لمشاركة PDF">Tap to Share PDF</span>
+  </button>
+
+</div>
+
+<!-- ── Doc Type Modal ── -->
+<div class="modal-overlay" id="docModal">
+  <div class="modal">
+    <div class="modal-title" data-en="Generate Document" data-ar="إنشاء مستند">Generate Document</div>
+    <div class="modal-sub" data-en="Choose the document type" data-ar="اختر نوع المستند">Choose the document type</div>
+    <div class="doc-choice-row">
+      <div class="doc-choice selected" id="choice-quote" onclick="selectDoc('quote')">
+        <div class="doc-icon">📄</div>
+        <div class="doc-name" data-en="Quotation" data-ar="عرض سعر">Quotation</div>
+        <div class="doc-name-ar">عرض سعر</div>
+      </div>
+      <div class="doc-choice" id="choice-invoice" onclick="selectDoc('invoice')">
+        <div class="doc-icon">🧾</div>
+        <div class="doc-name" data-en="Invoice" data-ar="فاتورة">Invoice</div>
+        <div class="doc-name-ar">فاتورة</div>
+      </div>
+    </div>
+    <div class="invoice-extra" id="invoiceExtra">
+      <div style="height:1px;background:var(--gold-pale);margin:0 0 14px;"></div>
+      <div class="modal-field">
+        <label data-en="Deposit Paid (SAR)" data-ar="الدفعة المقدمة (ريال)">Deposit Paid (SAR) <span class="opt">optional</span></label>
+        <input type="number" id="depositPaid" placeholder="e.g. 500" inputmode="decimal">
+      </div>
+      <div class="modal-field">
+        <label data-en="Quote Reference" data-ar="مرجع عرض السعر">Quote Reference <span class="opt">optional</span></label>
+        <input type="text" id="quoteRef" placeholder="e.g. SH-Q-20250718">
+      </div>
+    </div>
+    <!-- Save mode (only shown when editing an existing record) -->
+    <div class="invoice-extra" id="saveModeBox">
+      <div style="height:1px;background:var(--gold-pale);margin:0 0 14px;"></div>
+      <label class="modal-field" style="display:block;">
+        <span data-en="Save Mode" data-ar="طريقة الحفظ" style="display:block;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--smoke);margin-bottom:6px;">Save Mode</span>
+      </label>
+      <div class="doc-choice-row" style="margin-bottom:0;">
+        <div class="doc-choice selected" id="sm-update" onclick="selectSaveMode('update')">
+          <div class="doc-name" data-en="Update existing" data-ar="تحديث الحالي">Update existing</div>
+        </div>
+        <div class="doc-choice" id="sm-new" onclick="selectSaveMode('new')">
+          <div class="doc-name" data-en="Save as new" data-ar="حفظ كجديد">Save as new</div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="modal-btn modal-btn-cancel" onclick="closeDocModal()" data-en="Cancel" data-ar="إلغاء">Cancel</button>
+      <button class="modal-btn modal-btn-go" id="modalGoBtn" onclick="executeDocAction()" data-en="Download" data-ar="تحميل">Download</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── Records Modal (edit / invoice-from-quote) ── -->
+<div class="modal-overlay" id="recordsModal">
+  <div class="modal modal-lg">
+    <div class="modal-title" id="recordsTitle">Previous Documents</div>
+    <div class="modal-sub" id="recordsSub">Select a document to load</div>
+    <input type="text" class="records-search" id="recordsSearch" oninput="renderRecords()" placeholder="Search">
+    <div class="records-sortrow">
+      <select id="recordsSort" onchange="renderRecords()">
+        <option value="newest">Newest first</option>
+        <option value="oldest">Oldest first</option>
+        <option value="name">Client name</option>
+      </select>
+    </div>
+    <div class="records-list" id="recordsList"></div>
+    <div class="records-pager" id="recordsPager" style="display:none;">
+      <button class="pager-btn" id="pagerPrev" onclick="recordsPrevPage()">Previous</button>
+      <span class="pager-info" id="pagerInfo"></span>
+      <button class="pager-btn" id="pagerNext" onclick="recordsNextPage()">Next</button>
+    </div>
+    <div class="modal-actions" style="margin-top:12px;">
+      <button class="modal-btn modal-btn-cancel" onclick="closeRecordsModal()" data-en="Close" data-ar="إغلاق">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── Date Picker Modal ── -->
+<div class="modal-overlay" id="dateModal">
+  <div class="modal datepick">
+    <div class="modal-title" id="dateTitle">Select Delivery Date</div>
+    <div class="cal-typerow">
+      <button class="cal-typebtn active" id="cal-greg" onclick="setCalType('greg')">Gregorian</button>
+      <button class="cal-typebtn" id="cal-hijri" onclick="setCalType('hijri')">Hijri</button>
+    </div>
+    <div class="cal-header">
+      <button class="cal-nav" onclick="calPrevMonth()">‹</button>
+      <span class="cal-monthlabel" id="calMonthLabel"></span>
+      <button class="cal-nav" onclick="calNextMonth()">›</button>
+    </div>
+    <div class="cal-grid" id="calGrid"></div>
+    <div class="cal-preview" id="calPreview"></div>
+    <div class="modal-actions">
+      <button class="modal-btn modal-btn-cancel" onclick="clearDatePick()" data-en="Clear" data-ar="مسح">Clear</button>
+      <button class="modal-btn modal-btn-go" id="dateConfirmBtn" onclick="confirmDatePick()" data-en="Confirm" data-ar="تأكيد">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ PWA bridge: google.script.run → Apps Script API (doPost in Code.gs) ══ -->
 <script>
-/* =========================================================
-   CONFIG — paste your Google Apps Script /exec URLs here.
-   Get it from: Apps Script → Deploy → Manage deployments → Web app URL
-   ========================================================= */
-const GAS_URL = "https://script.google.com/macros/s/AKfycbxHrQGsltL5Rikal6C3o66ZO9zFFsykprI4TKx72kBwYWWyO1bW-WlPo-t_7b-5xJOuZQ/exec";
+(function () {
+  var API_URL = "https://script.google.com/macros/s/AKfycbxHrQGsltL5Rikal6C3o66ZO9zFFsykprI4TKx72kBwYWWyO1bW-WlPo-t_7b-5xJOuZQ/exec";
+  function call(fn, args) {
+    return fetch(API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' }, // text/plain avoids a CORS preflight
+      body: JSON.stringify({ fn: fn, args: args }),
+      redirect: 'follow'
+    }).then(function (r) {
+      if (!r.ok) throw new Error('Server error ' + r.status);
+      return r.json();
+    }).then(function (j) {
+      if (!j.ok) throw new Error(j.error || 'Server error');
+      return j.result;
+    });
+  }
+  function runner(onOk, onFail) {
+    return new Proxy({}, {
+      get: function (_, name) {
+        if (name === 'withSuccessHandler') return function (f) { return runner(f, onFail); };
+        if (name === 'withFailureHandler') return function (f) { return runner(onOk, f); };
+        if (name === 'withUserObject')     return function ()  { return runner(onOk, onFail); };
+        return function () {
+          var args = Array.prototype.slice.call(arguments);
+          call(String(name), args).then(
+            function (res) { if (onOk) onOk(res); },
+            function (err) {
+              if (!navigator.onLine) err = new Error('No internet connection / لا يوجد اتصال بالإنترنت');
+              if (onFail) onFail(err); else console.error(err);
+            });
+        };
+      }
+    });
+  }
+  window.google = window.google || {};
+  window.google.script = { run: runner(null, null) };
+})();
+</script>
+<script>
+// ═══════════════════════════════════════════════
+// TRANSLATIONS
+// ═══════════════════════════════════════════════
+const T = {
+  en: {
+    svcTab_t:'Tailoring', svcTab_e:'Embroidery', svcTab_a:'Alteration',
+    itemLabel:'Service', kebab_edit:'Edit', kebab_del:'Delete',
+    garmentLabel:'Garment Type', garment_abaya:'Abaya', garment_evening:'Evening Dress', garment_wedding:'Wedding Dress', garment_other:'Other (Custom)',
+    tierLabel:'Complexity', tier_simple:'Simple', tier_medium:'Medium', tier_luxury:'Luxury',
+    qtyLabel:'Quantity', notesLabel:'Notes', notesOpt:'optional',
+    notes_ph_t:'e.g. Black crepe, long sleeve', notes_ph_a:'e.g. Shorten by 5cm',
+    priceLabel:'Price (SAR)', lineTotalLabel:'Line Total',
+    durTab:'Duration', stitchTab:'No. of Stitches',
+    dur_ph:'e.g. 2:30', stitch_ph:'e.g. 8000',
+    heightLabel:'Height (CM)', widthLabel:'Width (CM)',
+    colorsLabel:'No. of Colors', fabricLabel:'Fabric Cost (SAR/m)', fabric_ph:'e.g. 120',
+    embrNote:'Price is calculated from the sheet. You can still adjust it manually if needed.',
+    calcSheet:'Calculate Price from Sheet',
+    calcSheetLoading:'Calculating from sheet…',
+    calcSheetDone:'✓ Price loaded from sheet',
+    calcSheetErr:'Could not read from sheet',
+    calcSheetNeedInput:'Enter duration or stitches first',
+    altTypeLabel:'Alteration Type',
+    alt_hem:'Hem Length', alt_size:'Size Adjustment', alt_sleeve:'Sleeve Adjustment',
+    alt_shoulder:'Shoulder Adjustment', alt_zipper:'Zipper Replacement',
+    alt_waist:'Waist Adjustment', alt_other:'Other (Custom)',
+    fabTypeLabel:'Fabric Type',
+    fab_plain:'Plain Fabric', fab_light:'Light Beading / Embroidery',
+    fab_medium:'Medium Beading', fab_heavy:'Heavy Beading',
+    customNote:'Custom — set price manually.',
+    fabricSupplyLabel:'Fabric Supply',
+    fabricByClient:'Client provides fabric',
+    fabricByUs:'We provide fabric (+60 SAR)',
+    fabricFee:'Fabric supply fee',
+    // Records / history
+    editExisting:'Edit Quote / Invoice',
+    createInvFromQuote:'Create Invoice from Quote',
+    recordsTitle:'Previous Documents',
+    recordsSub:'Select a document to load',
+    invFromQuoteTitle:'Select a Quotation',
+    searchPlaceholder:'Search by ref or client name',
+    sortNewest:'Newest first', sortOldest:'Oldest first', sortName:'Client name',
+    colRef:'Ref No.', colClient:'Client', colDate:'Date', colTotal:'Total',
+    noRecords:'No documents found',
+    loadingRecords:'Loading…',
+    prevPage:'Previous', nextPage:'Next', pageOf:'Page',
+    loadRecord:'Load', useAsQuote:'Use', close:'Close',
+    saveMode:'Save Mode', saveUpdate:'Update existing', saveNew:'Save as new',
+    editingRef:'Editing:',
+    // Delivery date
+    deliveryPickTitle:'Select Delivery Date',
+    calGregorian:'Gregorian', calHijri:'Hijri',
+    monthsGreg:['January','February','March','April','May','June','July','August','September','October','November','December'],
+    monthsHijri:['Muharram','Safar','Rabi I','Rabi II','Jumada I','Jumada II','Rajab','Shaban','Ramadan','Shawwal','Dhul-Qadah','Dhul-Hijjah'],
+    daysShort:['Su','Mo','Tu','We','Th','Fr','Sa'],
+    confirmDate:'Confirm', clearDate:'Clear',
+    err_name:'Please enter the client name.',
+    err_phone:'Phone must be 10 digits starting with 05.',
+    err_noItems:'Add at least one service.',
+    err_pdf:'Could not generate PDF: ', err_share:'Could not share: ',
+    generating:'Generating…', preparing:'Preparing…',
+    loadDoc:'Creating your document…', loadCalc:'Calculating price…', loadFetch:'Loading documents…',
+    saved:'Quote saved and PDF downloaded.', shared:'Shared successfully.',
+    fallback:'PDF downloaded. WhatsApp opened — attach PDF manually.',
+    phoneOk:'✓ Valid Saudi number', phoneErr:'Enter a 10-digit number starting with 05',
+    vatLine:'Includes VAT: SAR ',
+    btn_pdf:'Download PDF Quote', btn_wa:'Share via WhatsApp',
+  },
+  ar: {
+    svcTab_t:'خياطة', svcTab_e:'تطريز', svcTab_a:'تعديل',
+    itemLabel:'خدمة', kebab_edit:'تعديل', kebab_del:'حذف',
+    garmentLabel:'نوع القطعة', garment_abaya:'عباءة', garment_evening:'فستان سهرة', garment_wedding:'فستان زفاف', garment_other:'أخرى (حسب الطلب)',
+    tierLabel:'مستوى التنفيذ', tier_simple:'بسيط', tier_medium:'متوسط', tier_luxury:'فاخر',
+    qtyLabel:'الكمية', notesLabel:'ملاحظات', notesOpt:'اختياري',
+    notes_ph_t:'مثال: كريب أسود، كم طويل', notes_ph_a:'مثال: تقصير 5 سم',
+    priceLabel:'السعر (ريال)', lineTotalLabel:'إجمالي البند',
+    durTab:'المدة', stitchTab:'عدد الغرز',
+    dur_ph:'مثال: 2:30', stitch_ph:'مثال: 8000',
+    heightLabel:'الطول (سم)', widthLabel:'العرض (سم)',
+    colorsLabel:'عدد الألوان', fabricLabel:'تكلفة القماش (ريال/م)', fabric_ph:'مثال: 120',
+    embrNote:'السعر يُحسب من الشيت. يمكنك تعديله يدوياً إذا احتجت.',
+    calcSheet:'احتساب السعر من الشيت',
+    calcSheetLoading:'جارٍ الحساب من الشيت…',
+    calcSheetDone:'✓ تم جلب السعر من الشيت',
+    calcSheetErr:'تعذّرت القراءة من الشيت',
+    calcSheetNeedInput:'أدخل المدة أو عدد الغرز أولاً',
+    altTypeLabel:'نوع التعديل',
+    alt_hem:'تعديل الطول', alt_size:'تعديل المقاس', alt_sleeve:'تعديل الكم',
+    alt_shoulder:'تعديل الكتف', alt_zipper:'تغيير السحاب',
+    alt_waist:'تعديل الخصر', alt_other:'أخرى (حسب الطلب)',
+    fabTypeLabel:'نوع القماش',
+    fab_plain:'قماش سادة', fab_light:'خرز / تطريز خفيف',
+    fab_medium:'خرز متوسط', fab_heavy:'خرز ثقيل',
+    customNote:'حسب الطلب — حدد السعر يدوياً.',
+    fabricSupplyLabel:'توفير القماش',
+    fabricByClient:'العميل يوفر القماش',
+    fabricByUs:'نحن نوفر القماش (+60 ريال)',
+    fabricFee:'رسوم توفير القماش',
+    // Records / history
+    editExisting:'تعديل عرض سعر / فاتورة',
+    createInvFromQuote:'إنشاء فاتورة من عرض سعر',
+    recordsTitle:'المستندات السابقة',
+    recordsSub:'اختر مستنداً لتحميله',
+    invFromQuoteTitle:'اختر عرض سعر',
+    searchPlaceholder:'ابحث بالرقم المرجعي أو اسم العميل',
+    sortNewest:'الأحدث أولاً', sortOldest:'الأقدم أولاً', sortName:'اسم العميل',
+    colRef:'الرقم المرجعي', colClient:'العميل', colDate:'التاريخ', colTotal:'الإجمالي',
+    noRecords:'لا توجد مستندات',
+    loadingRecords:'جارٍ التحميل…',
+    prevPage:'السابق', nextPage:'التالي', pageOf:'صفحة',
+    loadRecord:'تحميل', useAsQuote:'استخدام', close:'إغلاق',
+    saveMode:'طريقة الحفظ', saveUpdate:'تحديث الحالي', saveNew:'حفظ كجديد',
+    editingRef:'تعديل:',
+    // Delivery date
+    deliveryPickTitle:'اختر موعد التسليم',
+    calGregorian:'ميلادي', calHijri:'هجري',
+    monthsGreg:['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'],
+    monthsHijri:['محرم','صفر','ربيع الأول','ربيع الثاني','جمادى الأولى','جمادى الآخرة','رجب','شعبان','رمضان','شوال','ذو القعدة','ذو الحجة'],
+    daysShort:['ح','ن','ث','ر','خ','ج','س'],
+    confirmDate:'تأكيد', clearDate:'مسح',
+    err_name:'الرجاء إدخال اسم العميلة.',
+    err_phone:'رقم الجوال يجب أن يكون 10 أرقام ويبدأ بـ 05.',
+    err_noItems:'أضف خدمة واحدة على الأقل.',
+    err_pdf:'تعذّر إنشاء ملف PDF: ', err_share:'تعذّرت المشاركة: ',
+    generating:'جارٍ الإنشاء…', preparing:'جارٍ التحضير…',
+    loadDoc:'جارٍ إنشاء المستند…', loadCalc:'جارٍ حساب السعر…', loadFetch:'جارٍ تحميل المستندات…',
+    saved:'تم حفظ عرض السعر وتحميل الـ PDF.', shared:'تمت المشاركة بنجاح.',
+    fallback:'تم تحميل الـ PDF. فتح واتساب — أرفق الملف يدوياً.',
+    phoneOk:'✓ رقم سعودي صحيح', phoneErr:'أدخل رقماً مكوناً من 10 أرقام يبدأ بـ 05',
+    vatLine:'يشمل الضريبة: ',
+    btn_pdf:'تحميل عرض السعر PDF', btn_wa:'مشاركة عبر واتساب',
+  }
+};
 
-const APPS = [
-  { id:"alter",    icon:"✂\uFE0E",  title:"تسعيرة التطريز",   desc:"عرض سعر تطريز وخياطة",  url: GAS_URL },
-  { id:"services", icon:"✦\uFE0E",  title:"تسعيرة الخدمات",   desc:"طباعة وتطريز وخدمات",   url: GAS_URL + "?page=services" },
-];
-const VERSION = "v1";
-/* ========================================================= */
+const DEFAULT_PRICES = {
+  tailoring: {
+    abaya:         { simple:350,  medium:650,  luxury:1200 },
+    evening_dress: { simple:500,  medium:900,  luxury:1800 },
+    wedding_dress: { simple:800,  medium:1500, luxury:3000 }
+  },
+  alterations: {
+    hem_length:          { plain:80,  light:150, medium:230, heavy:370 },
+    size_adjustment:     { plain:150, light:270, medium:430, heavy:690 },
+    sleeve_adjustment:   { plain:100, light:180, medium:290, heavy:460 },
+    shoulder_adjustment: { plain:120, light:220, medium:350, heavy:550 },
+    zipper:              { plain:70,  light:130, medium:200, heavy:320 },
+    waist_adjustment:    { plain:130, light:230, medium:380, heavy:600 },
+    other:               { plain:0,   light:0,   medium:0,   heavy:0   }
+  }
+};
 
-const $ = id => document.getElementById(id);
-const frame = $("app"), loader = $("loader");
-let current = null;
+const FABRIC_SUPPLY_FEE = 60; // SAR minimum added when we provide fabric
 
-$("ver").textContent = "Shantik " + VERSION;
-$("cards").innerHTML = APPS.map(a => `
-  <button class="card" data-id="${a.id}">
-    <span class="ic">${a.icon}</span>
-    <span>${a.title}<small>${a.desc}</small></span>
-  </button>`).join("");
-$("cards").addEventListener("click", e => {
-  const b = e.target.closest(".card"); if (b) open(b.dataset.id, true);
+// ═══════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════
+let lang      = 'en';
+let itemCount = 0;
+const itemData = [];  // locked item snapshots
+const colors   = [];
+
+// New feature state
+let _saveMode    = 'new';   // 'new' | 'update'
+let _existingRef = '';      // ref number when editing
+let _recordsMode = 'edit';  // 'edit' | 'invFromQuote'
+let _allRecords  = [];      // loaded records list
+let _recordsPage = 0;       // pagination
+let _calType     = 'greg';  // 'greg' | 'hijri'
+let _calView     = new Date(); // currently viewed month
+let _selectedDate = null;   // {greg:'dd/MM/yyyy', hijri:'...'}
+const RECORDS_PER_PAGE = 10;
+
+function t(k) { return (T[lang]||T.en)[k] || k; }
+
+// ═══════════════════════════════════════════════
+// LANGUAGE
+// ═══════════════════════════════════════════════
+function setLang(l) {
+  lang = l;
+  document.documentElement.lang = l;
+  document.documentElement.dir  = l === 'ar' ? 'rtl' : 'ltr';
+  document.body.classList.toggle('ar', l === 'ar');
+  document.getElementById('btn-en').classList.toggle('active', l === 'en');
+  document.getElementById('btn-ar').classList.toggle('active', l === 'ar');
+  document.querySelectorAll('[data-en]').forEach(el => { el.textContent = el.dataset[l] || el.dataset.en; });
+  document.querySelectorAll('[data-ph-en]').forEach(el => { el.placeholder = l === 'ar' ? el.dataset.phAr : el.dataset.phEn; });
+  // Rebuild unlocked cards only (locked cards show summary, no need to rebuild)
+  document.querySelectorAll('[id^="item-card-"]').forEach(card => {
+    const idx = parseInt(card.id.split('-')[2]);
+    if (!card.classList.contains('locked')) {
+      const activeSvc = getActiveService(idx);
+      const activeDur = getActiveDurTab(idx);
+      const savedPrices = {
+        t: document.getElementById('t-price-'+idx)?.value,
+        e: document.getElementById('e-price-'+idx)?.value,
+        a: document.getElementById('a-price-'+idx)?.value,
+      };
+      card.querySelector('.card-body-inner').innerHTML = buildCardInner(idx);
+      setServiceTab(idx, activeSvc);
+      if (activeSvc === 'embroidery') setDurTab(idx, activeDur);
+      // Restore prices after rebuild
+      if (savedPrices.t && document.getElementById('t-price-'+idx)) document.getElementById('t-price-'+idx).value = savedPrices.t;
+      if (savedPrices.e && document.getElementById('e-price-'+idx)) document.getElementById('e-price-'+idx).value = savedPrices.e;
+      if (savedPrices.a && document.getElementById('a-price-'+idx)) document.getElementById('a-price-'+idx).value = savedPrices.a;
+      updateSliderLabel(idx);
+    } else {
+      // Update kebab menu labels only
+      const editBtn = card.querySelector('.kebab-item:not(.del)');
+      const delBtn  = card.querySelector('.kebab-item.del');
+      if (editBtn) editBtn.textContent = t('kebab_edit');
+      if (delBtn)  delBtn.textContent  = t('kebab_del');
+    }
+  });
+}
+
+// ═══════════════════════════════════════════════
+// ADD / BUILD ITEM
+// ═══════════════════════════════════════════════
+function addItem() {
+  // Lock the previous card if any
+  const allCards = document.querySelectorAll('[id^="item-card-"]');
+  if (allCards.length > 0) {
+    const lastCard = allCards[allCards.length - 1];
+    const lastIdx  = parseInt(lastCard.id.split('-')[2]);
+    if (!lastCard.classList.contains('locked')) lockCard(lastIdx);
+  }
+
+  const idx = itemCount++;
+  itemData[idx] = null;
+  colors[idx]   = 5;
+
+  const div = document.createElement('div');
+  div.className = 'card';
+  div.id = 'item-card-' + idx;
+  div.innerHTML = buildCardHTML(idx);
+  document.getElementById('itemsContainer').appendChild(div);
+  setServiceTab(idx, 'tailoring');
+  updateSliderLabel(idx);
+  updateLiveTotal();
+  div.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function buildCardHTML(idx) {
+  const num = idx + 1;
+  return `
+    <!-- Kebab menu -->
+    <div class="card-menu-wrap">
+      <button class="kebab-btn" onclick="toggleKebab(${idx})" aria-label="options">⋯</button>
+      <div class="kebab-menu" id="kebab-${idx}">
+        <button class="kebab-item" onclick="unlockCard(${idx})">${t('kebab_edit')}</button>
+        <button class="kebab-item del" onclick="deleteCard(${idx})">${t('kebab_del')}</button>
+      </div>
+    </div>
+
+    <span class="item-num">${t('itemLabel')} ${num}</span>
+
+    <!-- Locked summary (shown when locked) -->
+    <div class="card-locked-summary" id="locked-summary-${idx}">
+      <div class="locked-label" id="locked-label-${idx}"></div>
+      <div class="locked-desc"  id="locked-desc-${idx}"></div>
+      <div class="locked-price" id="locked-price-${idx}"></div>
+    </div>
+
+    <!-- Full form (hidden when locked) -->
+    <div class="card-body-inner" id="card-inner-${idx}">
+      ${buildCardInner(idx)}
+    </div>
+  `;
+}
+
+function buildCardInner(idx) {
+  return `
+    <!-- Service tabs -->
+    <div class="svc-tabs">
+      <button class="svc-tab" id="tab-t-${idx}" onclick="setServiceTab(${idx},'tailoring')">${t('svcTab_t')}</button>
+      <button class="svc-tab" id="tab-e-${idx}" onclick="setServiceTab(${idx},'embroidery')">${t('svcTab_e')}</button>
+      <button class="svc-tab" id="tab-a-${idx}" onclick="setServiceTab(${idx},'alteration')">${t('svcTab_a')}</button>
+    </div>
+
+    <!-- TAILORING -->
+    <div id="panel-tailoring-${idx}">
+      <div class="field">
+        <label>${t('garmentLabel')}</label>
+        <select id="t-garment-${idx}" onchange="autoFillPrice(${idx},'tailoring')">
+          <option value="abaya">${t('garment_abaya')}</option>
+          <option value="evening_dress">${t('garment_evening')}</option>
+          <option value="wedding_dress">${t('garment_wedding')}</option>
+          <option value="other">${t('garment_other')}</option>
+        </select>
+      </div>
+      <div class="field" id="t-tier-field-${idx}">
+        <label>${t('tierLabel')}</label>
+        <select id="t-tier-${idx}" onchange="autoFillPrice(${idx},'tailoring')">
+          <option value="simple">${t('tier_simple')}</option>
+          <option value="medium">${t('tier_medium')}</option>
+          <option value="luxury">${t('tier_luxury')}</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>${t('qtyLabel')}</label>
+        <input type="number" id="t-qty-${idx}" value="1" min="1" inputmode="numeric" onchange="refreshTotal(${idx},'tailoring')">
+      </div>
+      <div class="field">
+        <label>${t('notesLabel')} <span class="opt">${t('notesOpt')}</span></label>
+        <input type="text" id="t-notes-${idx}" placeholder="${t('notes_ph_t')}">
+      </div>
+      <div class="field">
+        <label>${t('fabricSupplyLabel')}</label>
+        <select id="t-fabsupply-${idx}" onchange="onFabricSupplyChange(${idx},'tailoring')">
+          <option value="client">${t('fabricByClient')}</option>
+          <option value="us">${t('fabricByUs')}</option>
+        </select>
+      </div>
+      <div class="price-row">
+        <label>${t('priceLabel')}</label>
+        <input type="number" id="t-price-${idx}" value="350" inputmode="decimal" onchange="refreshTotal(${idx},'tailoring')">
+        <span class="currency">SAR</span>
+        <span class="line-total" id="t-linetotal-${idx}">= SAR 350.00</span>
+      </div>
+      <div class="estimate-note" id="t-custom-note-${idx}" style="display:none;">${t('customNote')}</div>
+    </div>
+
+    <!-- EMBROIDERY -->
+    <div id="panel-embroidery-${idx}" style="display:none;">
+      <div class="toggle-tabs">
+        <button class="toggle-tab active" id="tab-dur-${idx}" onclick="setDurTab(${idx},'duration')">${t('durTab')}</button>
+        <button class="toggle-tab" id="tab-stitch-${idx}" onclick="setDurTab(${idx},'stitches')">${t('stitchTab')}</button>
+      </div>
+      <div id="panel-dur-${idx}" class="field">
+        <input type="text" id="e-duration-${idx}" placeholder="${t('dur_ph')}" inputmode="text" oninput="formatTime(this)">
+      </div>
+      <div id="panel-stitch-${idx}" class="field" style="display:none;">
+        <input type="number" id="e-stitches-${idx}" placeholder="${t('stitch_ph')}" inputmode="numeric">
+      </div>
+      <div class="row-2">
+        <div class="field"><label>${t('heightLabel')}</label><input type="number" id="e-height-${idx}" placeholder="12" inputmode="decimal"></div>
+        <div class="field"><label>${t('widthLabel')}</label><input type="number" id="e-width-${idx}" placeholder="18" inputmode="decimal"></div>
+      </div>
+      <div class="field">
+        <label>${t('colorsLabel')}</label>
+        <div class="slider-wrap">
+          <span class="slider-value" id="e-sliderVal-${idx}">5</span>
+          <input type="range" id="e-colors-${idx}" min="1" max="15" value="5" oninput="updateSliderLabel(${idx})">
+          <div class="slider-labels"><span>1</span><span>15</span></div>
+        </div>
+      </div>
+      <div class="field"><label>${t('fabricLabel')}</label><input type="number" id="e-fabric-${idx}" placeholder="${t('fabric_ph')}" inputmode="decimal"></div>
+      <div class="field"><label>${t('qtyLabel')}</label><input type="number" id="e-qty-${idx}" value="1" min="1" inputmode="numeric" onchange="refreshTotal(${idx},'embroidery')"></div>
+      <div class="field">
+        <label>${t('notesLabel')} <span class="opt">${t('notesOpt')}</span></label>
+        <input type="text" id="e-notes-${idx}" placeholder="${t('notes_ph_t')}">
+      </div>
+      <div class="field">
+        <label>${t('fabricSupplyLabel')}</label>
+        <select id="e-fabsupply-${idx}" onchange="onFabricSupplyChange(${idx},'embroidery')">
+          <option value="client">${t('fabricByClient')}</option>
+          <option value="us">${t('fabricByUs')}</option>
+        </select>
+      </div>
+
+      <!-- Calculate from Sheet button -->
+      <button class="btn btn-calc-sheet" id="e-calc-btn-${idx}" onclick="calcEmbroideryFromSheet(${idx})">
+        <span>${t('calcSheet')}</span>
+      </button>
+      <div class="sheet-status" id="e-sheet-status-${idx}"></div>
+
+      <div class="price-row">
+        <label>${t('priceLabel')}</label>
+        <input type="number" id="e-price-${idx}" value="0" inputmode="decimal" onchange="refreshTotal(${idx},'embroidery')">
+        <span class="currency">SAR</span>
+        <span class="line-total" id="e-linetotal-${idx}">= SAR 0.00</span>
+      </div>
+      <div class="estimate-note">${t('embrNote')}</div>
+    </div>
+
+    <!-- ALTERATION -->
+    <div id="panel-alteration-${idx}" style="display:none;">
+      <div class="field">
+        <label>${t('altTypeLabel')}</label>
+        <select id="a-type-${idx}" onchange="autoFillPrice(${idx},'alteration')">
+          <option value="hem_length">${t('alt_hem')}</option>
+          <option value="size_adjustment">${t('alt_size')}</option>
+          <option value="sleeve_adjustment">${t('alt_sleeve')}</option>
+          <option value="shoulder_adjustment">${t('alt_shoulder')}</option>
+          <option value="zipper">${t('alt_zipper')}</option>
+          <option value="waist_adjustment">${t('alt_waist')}</option>
+          <option value="other">${t('alt_other')}</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>${t('fabTypeLabel')}</label>
+        <select id="a-fabric-${idx}" onchange="autoFillPrice(${idx},'alteration')">
+          <option value="plain">${t('fab_plain')}</option>
+          <option value="light">${t('fab_light')}</option>
+          <option value="medium">${t('fab_medium')}</option>
+          <option value="heavy">${t('fab_heavy')}</option>
+        </select>
+      </div>
+      <div class="field"><label>${t('qtyLabel')}</label><input type="number" id="a-qty-${idx}" value="1" min="1" inputmode="numeric" onchange="refreshTotal(${idx},'alteration')"></div>
+      <div class="field">
+        <label>${t('notesLabel')} <span class="opt">${t('notesOpt')}</span></label>
+        <input type="text" id="a-notes-${idx}" placeholder="${t('notes_ph_a')}">
+      </div>
+      <div class="field">
+        <label>${t('fabricSupplyLabel')}</label>
+        <select id="a-fabsupply-${idx}" onchange="onFabricSupplyChange(${idx},'alteration')">
+          <option value="client">${t('fabricByClient')}</option>
+          <option value="us">${t('fabricByUs')}</option>
+        </select>
+      </div>
+      <div class="price-row">
+        <label>${t('priceLabel')}</label>
+        <input type="number" id="a-price-${idx}" value="80" inputmode="decimal" onchange="refreshTotal(${idx},'alteration')">
+        <span class="currency">SAR</span>
+        <span class="line-total" id="a-linetotal-${idx}">= SAR 80.00</span>
+      </div>
+      <div class="estimate-note" id="a-custom-note-${idx}" style="display:none;">${t('customNote')}</div>
+    </div>
+  `;
+}
+
+// ═══════════════════════════════════════════════
+// LOCK / UNLOCK / DELETE
+// ═══════════════════════════════════════════════
+function lockCard(idx) {
+  const item = collectItem(idx);
+  itemData[idx] = item;
+  const card = document.getElementById('item-card-'+idx);
+  if (!card || !item) return;
+  card.classList.add('locked');
+  // Fill locked summary
+  document.getElementById('locked-label-'+idx).textContent = item.serviceType;
+  document.getElementById('locked-desc-'+idx).textContent  = item.description + (item.tier ? ' · ' + item.tier : '') + (item.qty > 1 ? ' × '+item.qty : '');
+  document.getElementById('locked-price-'+idx).textContent = 'SAR ' + fmt(item.lineTotal);
+}
+
+function unlockCard(idx) {
+  const card = document.getElementById('item-card-'+idx);
+  if (!card) return;
+  card.classList.remove('locked');
+  closeKebab(idx);
+}
+
+function deleteCard(idx) {
+  const card = document.getElementById('item-card-'+idx);
+  if (card) card.remove();
+  itemData[idx] = null;
+  closeAllKebabs();
+  updateLiveTotal();
+}
+
+// ═══════════════════════════════════════════════
+// KEBAB MENU
+// ═══════════════════════════════════════════════
+function toggleKebab(idx) {
+  const menu = document.getElementById('kebab-'+idx);
+  const isOpen = menu.classList.contains('open');
+  closeAllKebabs();
+  if (!isOpen) menu.classList.add('open');
+}
+function closeKebab(idx) {
+  document.getElementById('kebab-'+idx)?.classList.remove('open');
+}
+function closeAllKebabs() {
+  document.querySelectorAll('.kebab-menu').forEach(m => m.classList.remove('open'));
+}
+document.addEventListener('click', e => {
+  if (!e.target.closest('.card-menu-wrap')) closeAllKebabs();
 });
 
-function open(id, push){
-  const a = APPS.find(x => x.id === id); if (!a) return;
-  current = a;
-  $("title").textContent = a.title;
-  loader.classList.remove("hide");
-  frame.src = a.url;
-  $("home").style.display = "none";
-  $("view").classList.add("on");
-  if (push) history.pushState({id}, "", "#" + id);
+// ═══════════════════════════════════════════════
+// SERVICE / DUR TABS
+// ═══════════════════════════════════════════════
+function setServiceTab(idx, svc) {
+  ['tailoring','embroidery','alteration'].forEach(s => {
+    const key = s === 'tailoring' ? 't' : s === 'embroidery' ? 'e' : 'a';
+    document.getElementById('tab-'+key+'-'+idx)?.classList.toggle('active', s === svc);
+    const p = document.getElementById('panel-'+s+'-'+idx);
+    if (p) p.style.display = s === svc ? '' : 'none';
+  });
+  autoFillPrice(idx, svc);
 }
-function home(push){
-  current = null;
-  $("view").classList.remove("on");
-  $("home").style.display = "";
-  frame.src = "about:blank";
-  if (push) history.pushState({}, "", location.pathname);
+
+function setDurTab(idx, mode) {
+  const isDur = mode === 'duration';
+  document.getElementById('tab-dur-'+idx)?.classList.toggle('active', isDur);
+  document.getElementById('tab-stitch-'+idx)?.classList.toggle('active', !isDur);
+  const pd = document.getElementById('panel-dur-'+idx);
+  const ps = document.getElementById('panel-stitch-'+idx);
+  if (pd) pd.style.display = isDur ? '' : 'none';
+  if (ps) ps.style.display = isDur ? 'none' : '';
 }
-frame.addEventListener("load", () => loader.classList.add("hide"));
-$("back").onclick = () => history.length > 1 ? history.back() : home(true);
-$("reload").onclick = () => current && open(current.id, false);
-window.addEventListener("popstate", e => {
-  const id = (e.state && e.state.id) || location.hash.slice(1);
-  id ? open(id, false) : home(false);
+
+function getActiveService(idx) {
+  if (document.getElementById('tab-t-'+idx)?.classList.contains('active')) return 'tailoring';
+  if (document.getElementById('tab-e-'+idx)?.classList.contains('active')) return 'embroidery';
+  return 'alteration';
+}
+function getActiveDurTab(idx) {
+  return document.getElementById('tab-dur-'+idx)?.classList.contains('active') ? 'duration' : 'stitches';
+}
+
+// ═══════════════════════════════════════════════
+// PRICE LOGIC
+// ═══════════════════════════════════════════════
+function autoFillPrice(idx, svc) {
+  if (svc === 'tailoring') {
+    const g = document.getElementById('t-garment-'+idx)?.value;
+    const tier = document.getElementById('t-tier-'+idx)?.value;
+    const priceEl = document.getElementById('t-price-'+idx);
+    const noteEl  = document.getElementById('t-custom-note-'+idx);
+    const tierField = document.getElementById('t-tier-field-'+idx);
+    const isOther = g === 'other';
+
+    // Hide complexity tier for "Other", show custom note
+    if (tierField) tierField.style.display = isOther ? 'none' : '';
+    if (noteEl) noteEl.style.display = isOther ? '' : 'none';
+
+    if (priceEl && !priceEl.dataset.edited) {
+      if (isOther) {
+        priceEl.value = 0;
+      } else if (g && tier) {
+        priceEl.value = DEFAULT_PRICES.tailoring[g]?.[tier] ?? 0;
+      }
+    }
+    refreshTotal(idx, 'tailoring');
+  }
+  if (svc === 'alteration') {
+    const type = document.getElementById('a-type-'+idx)?.value;
+    const fab  = document.getElementById('a-fabric-'+idx)?.value;
+    const priceEl = document.getElementById('a-price-'+idx);
+    const noteEl  = document.getElementById('a-custom-note-'+idx);
+    if (priceEl && type && fab && !priceEl.dataset.edited) {
+      priceEl.value = DEFAULT_PRICES.alterations[type]?.[fab] ?? 0;
+    }
+    const isCustom = type === 'other' || (DEFAULT_PRICES.alterations[type]?.[fab] ?? 0) === 0;
+    if (noteEl) noteEl.style.display = isCustom ? '' : 'none';
+    refreshTotal(idx, 'alteration');
+  }
+}
+
+function refreshTotal(idx, svc) {
+  const key = svc === 'tailoring' ? 't' : svc === 'embroidery' ? 'e' : 'a';
+  const qty   = parseInt(document.getElementById(key+'-qty-'+idx)?.value) || 1;
+  const price = parseFloat(document.getElementById(key+'-price-'+idx)?.value) || 0;
+  const fabFee = getFabricSupply(idx, svc) === 'us' ? FABRIC_SUPPLY_FEE : 0;
+  const el    = document.getElementById(key+'-linetotal-'+idx);
+  const lineTotal = (price * qty) + fabFee;
+  if (el) {
+    el.textContent = fabFee > 0
+      ? '= SAR ' + fmt(lineTotal) + ' (+' + fabFee + ')'
+      : '= SAR ' + fmt(lineTotal);
+  }
+  updateLiveTotal();
+}
+
+// ═══════════════════════════════════════════════
+// LIVE TOTAL — updates automatically on any change
+// Sums all cards (locked snapshots + live unlocked cards)
+// ═══════════════════════════════════════════════
+function updateLiveTotal() {
+  const cards = document.querySelectorAll('[id^="item-card-"]');
+  if (!cards.length) {
+    document.getElementById('totalBlock').classList.remove('visible');
+    return;
+  }
+
+  let subtotal = 0;
+  cards.forEach(card => {
+    const idx = parseInt(card.id.split('-')[2]);
+    if (card.classList.contains('locked')) {
+      // Use stored snapshot
+      if (itemData[idx]) subtotal += itemData[idx].lineTotal;
+    } else {
+      // Read live from the active service form
+      const item = collectItem(idx);
+      if (item) subtotal += item.lineTotal;
+    }
+  });
+
+  const useVAT = document.getElementById('applyVAT').checked;
+  const vat    = useVAT ? subtotal * 0.15 : 0;
+  document.getElementById('totalAmount').textContent = fmt(subtotal + vat);
+  const vatEl = document.getElementById('totalVatNote');
+  vatEl.textContent = useVAT ? t('vatLine') + fmt(vat) + ' SAR' : '';
+  document.getElementById('totalBlock').classList.add('visible');
+
+  // Enable action buttons once there's a total
+  if (subtotal > 0) {
+    document.getElementById('pdfBtn').disabled = false;
+    document.getElementById('waBtn').disabled  = false;
+  }
+}
+
+// Mark price as manually edited so auto-fill stops
+document.addEventListener('input', e => {
+  if (e.target && /^[tea]-price-\d+$/.test(e.target.id)) {
+    e.target.dataset.edited = '1';
+    const idx = parseInt(e.target.id.split('-')[2]);
+    const svc = e.target.id[0] === 't' ? 'tailoring' : e.target.id[0] === 'e' ? 'embroidery' : 'alteration';
+    refreshTotal(idx, svc);
+  }
 });
 
-// Deep link: /#services opens straight into that app
-if (location.hash) open(location.hash.slice(1), false);
-
-// Offline banner
-const net = () => $("offline").classList.toggle("on", !navigator.onLine);
-addEventListener("online", net); addEventListener("offline", net); net();
-
-// Service worker
-if ("serviceWorker" in navigator) {
-  addEventListener("load", () => navigator.serviceWorker.register("sw.js"));
+// ═══════════════════════════════════════════════
+// FABRIC SUPPLY — adds 60 SAR fee when we provide fabric
+// ═══════════════════════════════════════════════
+function getFabricSupply(idx, svc) {
+  const key = svc === 'tailoring' ? 't' : svc === 'embroidery' ? 'e' : 'a';
+  const el  = document.getElementById(key+'-fabsupply-'+idx);
+  return el ? el.value : 'client';
 }
+function onFabricSupplyChange(idx, svc) {
+  refreshTotal(idx, svc);
+  updateLiveTotal();
+}
+
+// Update live total on any input/change across the form
+document.addEventListener('change', e => {
+  if (e.target && e.target.closest && e.target.closest('[id^="item-card-"]')) {
+    updateLiveTotal();
+  }
+});
+
+// ═══════════════════════════════════════════════
+// EMBROIDERY — Calculate price from Google Sheet
+// Sends inputs to sheet (I3–M3), reads back G11/G12
+// ═══════════════════════════════════════════════
+function calcEmbroideryFromSheet(idx) {
+  const isDur    = document.getElementById('tab-dur-'+idx)?.classList.contains('active');
+  const duration = document.getElementById('e-duration-'+idx)?.value.trim() || '';
+  const stitches = document.getElementById('e-stitches-'+idx)?.value.trim() || '';
+  const height   = document.getElementById('e-height-'+idx)?.value.trim() || '';
+  const width    = document.getElementById('e-width-'+idx)?.value.trim() || '';
+  const nColors  = colors[idx] || 5;
+  const fabric   = document.getElementById('e-fabric-'+idx)?.value.trim() || '0';
+  const qty      = parseInt(document.getElementById('e-qty-'+idx)?.value) || 1;
+
+  const statusEl = document.getElementById('e-sheet-status-'+idx);
+  const btnEl    = document.getElementById('e-calc-btn-'+idx);
+
+  // Require duration or stitches
+  if (isDur && !duration) { statusEl.textContent = t('calcSheetNeedInput'); statusEl.className = 'sheet-status err'; return; }
+  if (!isDur && !stitches) { statusEl.textContent = t('calcSheetNeedInput'); statusEl.className = 'sheet-status err'; return; }
+
+  // Loading state
+  btnEl.disabled = true;
+  btnEl.querySelector('span').textContent = t('calcSheetLoading');
+  statusEl.textContent = '';
+  statusEl.className = 'sheet-status loading';
+
+  const useDiscount = document.getElementById('applyDiscount').checked;
+
+  const item = {
+    inputType:  isDur ? 'duration' : 'stitches',
+    duration:   duration,
+    stitches:   stitches,
+    height:     height || '0',
+    width:      width  || '0',
+    colors:     nColors,
+    fabricCost: fabric,
+    quantity:   qty
+  };
+
+  showLoading(t('loadCalc'));
+  google.script.run
+    .withSuccessHandler(function(result) {
+      hideLoading();
+      // result = { base, discounted }
+      const unitPrice = useDiscount ? (result.discounted || 0) : (result.base || 0);
+      const priceEl = document.getElementById('e-price-'+idx);
+      if (priceEl) {
+        priceEl.value = unitPrice.toFixed(2);
+        delete priceEl.dataset.edited; // fresh sheet value, not manual
+      }
+      refreshTotal(idx, 'embroidery');
+      statusEl.textContent = t('calcSheetDone') + ' (SAR ' + fmt(unitPrice) + ')';
+      statusEl.className = 'sheet-status ok';
+      btnEl.disabled = false;
+      btnEl.querySelector('span').textContent = t('calcSheet');
+    })
+    .withFailureHandler(function(err) {
+      hideLoading();
+      statusEl.textContent = t('calcSheetErr') + ': ' + (err.message || err);
+      statusEl.className = 'sheet-status err';
+      btnEl.disabled = false;
+      btnEl.querySelector('span').textContent = t('calcSheet');
+    })
+    .calculatePrice(item);
+}
+
+
+// ═══════════════════════════════════════════════
+// SLIDER
+// ═══════════════════════════════════════════════
+function updateSliderLabel(idx) {
+  const slider = document.getElementById('e-colors-'+idx);
+  if (!slider) return;
+  colors[idx] = Number(slider.value);
+  const label = document.getElementById('e-sliderVal-'+idx);
+  if (!label) return;
+  const pct = (slider.value - 1) / 14;
+  const tw  = slider.offsetWidth || 240;
+  label.style.left = (16 + pct * (tw - 32)) + 'px';
+  label.textContent = slider.value;
+}
+
+function formatTime(input) {
+  let v = input.value.replace(/[^0-9]/g, '');
+  if (v.length >= 3) v = v.slice(0, v.length-2) + ':' + v.slice(-2);
+  input.value = v;
+}
+
+// ═══════════════════════════════════════════════
+// COLLECT ITEM (from live form fields)
+// ═══════════════════════════════════════════════
+function collectItem(idx) {
+  const svc = getActiveService(idx);
+
+  if (svc === 'tailoring') {
+    const g    = document.getElementById('t-garment-'+idx)?.value || 'abaya';
+    const tier = document.getElementById('t-tier-'+idx)?.value || 'simple';
+    const qty  = parseInt(document.getElementById('t-qty-'+idx)?.value) || 1;
+    const unit = parseFloat(document.getElementById('t-price-'+idx)?.value) || 0;
+    const notes = document.getElementById('t-notes-'+idx)?.value.trim() || '';
+    const gL = { abaya:t('garment_abaya'), evening_dress:t('garment_evening'), wedding_dress:t('garment_wedding'), other:t('garment_other') };
+    const tL = { simple:t('tier_simple'), medium:t('tier_medium'), luxury:t('tier_luxury') };
+    const isOther = g === 'other';
+    const supply = getFabricSupply(idx, 'tailoring');
+    const fabFee = supply === 'us' ? FABRIC_SUPPLY_FEE : 0;
+    return { serviceType:t('svcTab_t'), description:gL[g]||g, tier: isOther ? '' : (tL[tier]||tier),
+      unitPrice:unit, qty, lineTotal:(unit*qty)+fabFee, notes, isEstimate:isOther,
+      fabricSupply:supply, fabricFee:fabFee };
+  }
+
+  if (svc === 'embroidery') {
+    const isDur  = document.getElementById('tab-dur-'+idx)?.classList.contains('active');
+    const qty    = parseInt(document.getElementById('e-qty-'+idx)?.value) || 1;
+    const unit   = parseFloat(document.getElementById('e-price-'+idx)?.value) || 0;
+    const notes  = document.getElementById('e-notes-'+idx)?.value.trim() || '';
+    const height = document.getElementById('e-height-'+idx)?.value || '';
+    const width  = document.getElementById('e-width-'+idx)?.value || '';
+    const nc     = colors[idx] || 5;
+    const fabric = document.getElementById('e-fabric-'+idx)?.value || '';
+    const parts  = [height&&width ? height+'×'+width+' cm' : '', nc+' colors', fabric?'SAR '+fabric+'/m':''].filter(Boolean);
+    const desc   = parts.join(', ') || t('svcTab_e');
+    const supply = getFabricSupply(idx, 'embroidery');
+    const fabFee = supply === 'us' ? FABRIC_SUPPLY_FEE : 0;
+    return {
+      serviceType: t('svcTab_e'), description: desc, tier:'',
+      unitPrice: unit, qty, lineTotal: (unit*qty)+fabFee, notes, isEstimate: unit===0,
+      inputType: isDur?'duration':'stitches',
+      duration:  isDur ? document.getElementById('e-duration-'+idx)?.value||'' : '',
+      stitches:  isDur ? '' : document.getElementById('e-stitches-'+idx)?.value||'',
+      height, width, colors: nc, fabricCost: fabric,
+      fabricSupply:supply, fabricFee:fabFee
+    };
+  }
+
+  // alteration
+  const type   = document.getElementById('a-type-'+idx)?.value || 'hem_length';
+  const fabric = document.getElementById('a-fabric-'+idx)?.value || 'plain';
+  const qty    = parseInt(document.getElementById('a-qty-'+idx)?.value) || 1;
+  const unit   = parseFloat(document.getElementById('a-price-'+idx)?.value) || 0;
+  const notes  = document.getElementById('a-notes-'+idx)?.value.trim() || '';
+  const tL = { hem_length:t('alt_hem'), size_adjustment:t('alt_size'), sleeve_adjustment:t('alt_sleeve'), shoulder_adjustment:t('alt_shoulder'), zipper:t('alt_zipper'), waist_adjustment:t('alt_waist'), other:t('alt_other') };
+  const fL = { plain:t('fab_plain'), light:t('fab_light'), medium:t('fab_medium'), heavy:t('fab_heavy') };
+  const supply = getFabricSupply(idx, 'alteration');
+  const fabFee = supply === 'us' ? FABRIC_SUPPLY_FEE : 0;
+  return { serviceType:t('svcTab_a'), description:tL[type]||type, tier:fL[fabric]||fabric,
+    unitPrice:unit, qty, lineTotal:(unit*qty)+fabFee, notes, isEstimate:false,
+    fabricSupply:supply, fabricFee:fabFee };
+}
+
+// ═══════════════════════════════════════════════
+// CALCULATE TOTAL
+// ═══════════════════════════════════════════════
+function buildTotal() {
+  const name = document.getElementById('clientName').value.trim();
+  if (!name) { showError(t('err_name')); return; }
+  const phone = document.getElementById('phone').value.trim();
+  if (phone) {
+    const pres = normalizeSaudiPhone(phone);
+    if (!pres.ok) { showError(t('err_phone')); return; }
+    document.getElementById('phone').value = pres.value; // normalize in place
+  }
+  const cards = document.querySelectorAll('[id^="item-card-"]');
+  if (!cards.length) { showError(t('err_noItems')); return; }
+
+  hideMessages();
+
+  // Lock all unlocked cards and collect data
+  cards.forEach(card => {
+    const idx = parseInt(card.id.split('-')[2]);
+    if (!card.classList.contains('locked')) lockCard(idx);
+    else {
+      // already locked — itemData[idx] already set from lockCard
+    }
+  });
+
+  let subtotal = 0;
+  itemData.filter(Boolean).forEach(item => { subtotal += item.lineTotal; });
+
+  const useVAT = document.getElementById('applyVAT').checked;
+  const vat    = useVAT ? subtotal * 0.15 : 0;
+  document.getElementById('totalAmount').textContent = fmt(subtotal + vat);
+  const vatEl = document.getElementById('totalVatNote');
+  vatEl.textContent = useVAT ? t('vatLine') + fmt(vat) + ' SAR' : '';
+  document.getElementById('totalBlock').classList.add('visible');
+  document.getElementById('pdfBtn').disabled = false;
+  document.getElementById('waBtn').disabled  = false;
+}
+
+// ═══════════════════════════════════════════════
+// PAYLOAD
+// ═══════════════════════════════════════════════
+function buildPayload(docType) {
+  const useVAT      = document.getElementById('applyVAT').checked;
+  const useDiscount = document.getElementById('applyDiscount').checked;
+  const validItems  = itemData.filter(Boolean);
+  const subtotal    = validItems.reduce((s,i) => s + i.lineTotal, 0);
+  const phoneRes    = normalizeSaudiPhone(document.getElementById('phone').value.trim());
+  return {
+    clientName:   document.getElementById('clientName').value.trim(),
+    phone:        phoneRes.ok ? phoneRes.value : document.getElementById('phone').value.trim(),
+    notes:        document.getElementById('generalNotes').value.trim(),
+    occasion:     document.getElementById('occasion')?.value.trim() || '',
+    deliveryDate: document.getElementById('deliveryDate')?.value.trim() || '',
+    deliveryHijri: document.getElementById('deliveryDate')?.dataset.hijri || '',
+    items:        validItems,
+    subtotal,
+    grandTotal:   subtotal + (useVAT ? subtotal*0.15 : 0),
+    applyVAT:     useVAT,
+    applyDiscount: useDiscount,
+    docType:      docType || 'quote',
+    depositPaid:  parseFloat(document.getElementById('depositPaid')?.value) || 0,
+    quoteRef:     document.getElementById('quoteRef')?.value.trim() || '',
+    saveMode:     _saveMode,
+    existingRef:  _existingRef
+  };
+}
+
+// ── Modal ─────────────────────────────────────────────────────
+let _modalAction = 'download';
+let _docType     = 'quote';
+
+function openDocModal(action) {
+  _modalAction = action;
+  document.getElementById('docModal').classList.add('open');
+  const goBtn = document.getElementById('modalGoBtn');
+  goBtn.textContent = action === 'whatsapp' ? (lang==='ar'?'مشاركة':'Share') : (lang==='ar'?'تحميل':'Download');
+
+  // Show save-mode choice only when editing an existing record
+  const smBox = document.getElementById('saveModeBox');
+  if (_existingRef) {
+    smBox.classList.add('visible');
+    selectSaveMode('update');
+  } else {
+    smBox.classList.remove('visible');
+    _saveMode = 'new';
+  }
+
+  selectDoc('quote');
+}
+function closeDocModal() { document.getElementById('docModal').classList.remove('open'); }
+function selectDoc(type) {
+  _docType = type;
+  document.getElementById('choice-quote').classList.toggle('selected', type==='quote');
+  document.getElementById('choice-invoice').classList.toggle('selected', type==='invoice');
+  document.getElementById('invoiceExtra').classList.toggle('visible', type==='invoice');
+}
+async function executeDocAction() {
+  closeDocModal();
+  if (_modalAction === 'whatsapp') await shareWhatsApp(_docType);
+  else await downloadPDF(_docType);
+}
+document.getElementById('docModal').addEventListener('click', function(e) {
+  if (e.target === this) closeDocModal();
+});
+
+// ── PDF & WHATSAPP ────────────────────────────────────────────
+async function downloadPDF(docType) {
+  const btn    = document.getElementById('pdfBtn');
+  const spanEl = btn.querySelector('span');
+  btn.disabled = true;
+  spanEl.textContent = t('generating');
+  hideMessages();
+  showLoading(t('loadDoc'));
+  try {
+    const payload = buildPayload(docType || 'quote');
+    const result  = await new Promise((res, rej) =>
+      google.script.run.withSuccessHandler(res).withFailureHandler(rej)
+        .generateServicesQuotePDF(payload));
+    triggerDownload(result.pdfBase64, result.quoteNo + '.pdf');
+    showSuccess(t('saved'));
+  } catch(err) { showError(t('err_pdf') + (err.message || err)); }
+  hideLoading();
+  btn.disabled = false;
+  spanEl.textContent = lang === 'ar' ? 'تحميل PDF' : 'Download PDF';
+}
+
+// ── Share via WhatsApp — two-step fix ────────────────────────
+let _waPendingFile = null;
+let _waPendingMsg  = null;
+let _waPendingPh   = null;
+
+async function shareWhatsApp(docType) {
+  const btn    = document.getElementById('waBtn');
+  const spanEl = btn.querySelector('span');
+  btn.disabled = true;
+  spanEl.textContent = t('preparing');
+  hideMessages();
+  document.getElementById('waTapBtn').style.display = 'none';
+  showLoading(t('loadDoc'));
+
+  try {
+    const payload = buildPayload(docType || 'quote');
+    const result  = await new Promise((res, rej) =>
+      google.script.run.withSuccessHandler(res).withFailureHandler(rej)
+        .generateServicesQuotePDF(payload));
+
+    const bytes = Uint8Array.from(atob(result.pdfBase64), c => c.charCodeAt(0));
+    const blob  = new Blob([bytes], { type:'application/pdf' });
+    const file  = new File([blob], result.quoteNo+'.pdf', { type:'application/pdf' });
+    const name  = payload.clientName || 'عزيزتنا';
+    const isInv = docType === 'invoice';
+    const msg   = isInv
+      ? `مرحباً ${name} 🌿\nيسعدنا إرسال فاتورتكم من شانتيك.\nشكراً لثقتكم.\n— فريق شانتيك ✨`
+      : `مرحباً ${name} 🌿\nيسعدنا إرسال عرض السعر الخاص بكم من شانتيك.\nنتطلع لخدمتكم.\n— فريق شانتيك ✨`;
+
+    hideLoading();
+    if (navigator.canShare && navigator.canShare({ files:[file] })) {
+      _waPendingFile = file;
+      _waPendingMsg  = msg;
+      _waPendingPh   = payload.phone ? payload.phone.replace(/[^0-9]/g,'') : '';
+      const tapBtn = document.getElementById('waTapBtn');
+      tapBtn.style.display = 'flex';
+      tapBtn.scrollIntoView({ behavior:'smooth', block:'nearest' });
+      showSuccess(lang === 'ar' ? 'الملف جاهز! اضغط الزر أدناه للمشاركة.' : 'PDF ready! Tap the button below to share.');
+    } else {
+      triggerDownload(result.pdfBase64, file.name);
+      const ph = payload.phone ? payload.phone.replace(/[^0-9]/g,'') : '';
+      window.open('https://wa.me/'+ph+'?text='+encodeURIComponent(msg), '_blank');
+      showSuccess(t('fallback'));
+    }
+  } catch(err) { hideLoading(); if (err.name !== 'AbortError') showError(t('err_share')+(err.message||err)); }
+  btn.disabled = false;
+  spanEl.textContent = t('btn_wa');
+}
+
+async function tapToShare() {
+  if (!_waPendingFile) return;
+  try {
+    await navigator.share({ files:[_waPendingFile], text:_waPendingMsg, title:'شانتيك' });
+    document.getElementById('waTapBtn').style.display = 'none';
+    _waPendingFile = null;
+    showSuccess(t('shared'));
+  } catch(err) {
+    if (err.name !== 'AbortError') {
+      window.open('https://wa.me/'+(_waPendingPh||'')+'?text='+encodeURIComponent(_waPendingMsg), '_blank');
+    }
+  }
+}
+
+function triggerDownload(b64, filename) {
+  const bytes = Uint8Array.from(atob(b64), c => c.charCodeAt(0));
+  const url   = URL.createObjectURL(new Blob([bytes], { type:'application/pdf' }));
+  const a     = document.createElement('a');
+  a.href = url; a.download = filename; a.click(); URL.revokeObjectURL(url);
+}
+
+// ═══════════════════════════════════════════════
+// HELPERS
+// ═══════════════════════════════════════════════
+function fmt(n) { return Number(n).toLocaleString('en-SA', { minimumFractionDigits:2, maximumFractionDigits:2 }); }
+function showError(msg) { const el=document.getElementById('errorMsg'); el.textContent=msg; el.classList.add('visible'); el.scrollIntoView({behavior:'smooth',block:'nearest'}); }
+function showSuccess(msg) { const el=document.getElementById('successMsg'); el.textContent=msg; el.classList.add('visible'); }
+function hideMessages() { document.getElementById('errorMsg').classList.remove('visible'); document.getElementById('successMsg').classList.remove('visible'); }
+
+// ═══════════════════════════════════════════════
+// LOADING OVERLAY
+// ═══════════════════════════════════════════════
+function showLoading(msg) {
+  const ov = document.getElementById('loadingOverlay');
+  document.getElementById('loadingText').textContent = msg || '';
+  ov.classList.add('show');
+}
+function hideLoading() {
+  document.getElementById('loadingOverlay').classList.remove('show');
+}
+
+// ═══════════════════════════════════════════════
+// PHONE — normalize to +9665******** (Saudi)
+// Strips spaces/symbols, adds country code, fixes leading zero
+// ═══════════════════════════════════════════════
+function normalizeSaudiPhone(raw) {
+  if (!raw) return { ok:false, value:'', empty:true };
+  // Keep only digits (drop spaces, +, -, etc.)
+  let d = String(raw).replace(/\D/g, '');
+  // Handle common prefixes
+  if (d.indexOf('00966') === 0) d = d.slice(5);        // 00966...
+  else if (d.indexOf('966') === 0) d = d.slice(3);      // 966...
+  if (d.indexOf('0') === 0) d = d.slice(1);             // leading 0 → drop
+  // Now d should be 9XXXXXXXX (9 digits, starts with 5)
+  if (/^5\d{8}$/.test(d)) {
+    return { ok:true, value:'+966' + d, empty:false };
+  }
+  return { ok:false, value:raw, empty:false };
+}
+
+const phoneEl = document.getElementById('phone');
+phoneEl.addEventListener('input', function() {
+  const h = document.getElementById('phoneHint');
+  const raw = this.value.trim();
+  if (!raw) { h.textContent=''; h.className='phone-hint'; return; }
+  const res = normalizeSaudiPhone(raw);
+  if (res.ok) { h.textContent = t('phoneOk') + ' → ' + res.value; h.className='phone-hint ok'; }
+  else { h.textContent = t('phoneErr'); h.className='phone-hint err'; }
+});
+// Normalize into the field when user leaves it
+phoneEl.addEventListener('blur', function() {
+  const res = normalizeSaudiPhone(this.value.trim());
+  if (res.ok) {
+    this.value = res.value;
+    const h = document.getElementById('phoneHint');
+    h.textContent = t('phoneOk'); h.className='phone-hint ok';
+  }
+});
+
+// ═══════════════════════════════════════════════
+// SAVE MODE (update vs new)
+// ═══════════════════════════════════════════════
+function selectSaveMode(mode) {
+  _saveMode = mode;
+  document.getElementById('sm-update').classList.toggle('selected', mode === 'update');
+  document.getElementById('sm-new').classList.toggle('selected', mode === 'new');
+}
+
+// ═══════════════════════════════════════════════
+// EDITING BANNER
+// ═══════════════════════════════════════════════
+function clearEditing() {
+  _existingRef = '';
+  _saveMode = 'new';
+  document.getElementById('editingBanner').style.display = 'none';
+}
+function showEditingBanner(ref) {
+  const b = document.getElementById('editingBanner');
+  document.getElementById('editingBannerText').textContent = t('editingRef') + ' ' + ref;
+  b.style.display = 'flex';
+}
+
+// ═══════════════════════════════════════════════
+// RECORDS MODAL (edit existing / invoice-from-quote)
+// ═══════════════════════════════════════════════
+function openRecordsModal(mode) {
+  _recordsMode = mode;
+  _recordsPage = 0;
+  const modal = document.getElementById('recordsModal');
+  const title = document.getElementById('recordsTitle');
+  const sub   = document.getElementById('recordsSub');
+  document.getElementById('recordsSearch').value = '';
+
+  if (mode === 'invFromQuote') {
+    title.textContent = t('invFromQuoteTitle');
+    sub.textContent   = t('recordsSub');
+  } else {
+    title.textContent = t('recordsTitle');
+    sub.textContent   = t('recordsSub');
+  }
+  // Update search placeholder + sort labels
+  document.getElementById('recordsSearch').placeholder = t('searchPlaceholder');
+  const sortSel = document.getElementById('recordsSort');
+  sortSel.options[0].text = t('sortNewest');
+  sortSel.options[1].text = t('sortOldest');
+  sortSel.options[2].text = t('sortName');
+
+  modal.classList.add('open');
+
+  // Load from sheet
+  const listEl = document.getElementById('recordsList');
+  listEl.innerHTML = '<div class="records-empty">' + t('loadingRecords') + '</div>';
+  document.getElementById('recordsPager').style.display = 'none';
+
+  const filterType = mode === 'invFromQuote' ? 'quote' : 'all';
+  const t0 = Date.now();
+  google.script.run
+    .withSuccessHandler(function(records) {
+      _allRecords = records || [];
+      // TEMP DEBUG: show what came back
+      if (!records || records.length === 0) {
+        listEl.innerHTML = '<div class="records-empty">DEBUG: server returned ' +
+          (records === null ? 'null' : (records === undefined ? 'undefined' : (records.length + ' records'))) +
+          ' in ' + (Date.now()-t0) + 'ms<br>filterType=' + filterType + '</div>';
+        return;
+      }
+      renderRecords();
+    })
+    .withFailureHandler(function(err) {
+      listEl.innerHTML = '<div class="records-empty" style="color:#c0392b;">DEBUG ERROR:<br>' +
+        (err && err.message ? err.message : String(err)) + '</div>';
+    })
+    .getServicesRecords(filterType);
+}
+
+function closeRecordsModal() {
+  document.getElementById('recordsModal').classList.remove('open');
+}
+
+function renderRecords() {
+  const q    = (document.getElementById('recordsSearch').value || '').toLowerCase().trim();
+  const sort = document.getElementById('recordsSort').value;
+
+  // Filter
+  let list = _allRecords.filter(r => {
+    if (!q) return true;
+    return String(r.ref).toLowerCase().indexOf(q) !== -1
+        || String(r.client).toLowerCase().indexOf(q) !== -1;
+  });
+
+  // Sort
+  if (sort === 'oldest') list = list.slice().reverse();
+  else if (sort === 'name') list = list.slice().sort((a,b) => String(a.client).localeCompare(String(b.client)));
+  // 'newest' = default order (already newest first)
+
+  const listEl = document.getElementById('recordsList');
+
+  if (!list.length) {
+    listEl.innerHTML = '<div class="records-empty">' + t('noRecords') + '</div>';
+    document.getElementById('recordsPager').style.display = 'none';
+    return;
+  }
+
+  // Pagination
+  const totalPages = Math.ceil(list.length / RECORDS_PER_PAGE);
+  if (_recordsPage >= totalPages) _recordsPage = totalPages - 1;
+  if (_recordsPage < 0) _recordsPage = 0;
+  const start = _recordsPage * RECORDS_PER_PAGE;
+  const pageItems = list.slice(start, start + RECORDS_PER_PAGE);
+
+  let html = '';
+  pageItems.forEach(r => {
+    const badgeClass = r.docType === 'invoice' ? 'invoice' : 'quote';
+    const badgeText  = r.docType === 'invoice' ? (lang==='ar'?'فاتورة':'Invoice') : (lang==='ar'?'عرض سعر':'Quote');
+    html += `<div class="record-row" onclick="loadRecord('${String(r.ref).replace(/'/g,"\\'")}')">
+      <div class="record-info">
+        <div class="record-ref">${r.ref}</div>
+        <div class="record-meta">${r.client || '—'} · ${r.date} · SAR ${fmt(r.grandTotal||0)}</div>
+      </div>
+      <span class="record-badge ${badgeClass}">${badgeText}</span>
+    </div>`;
+  });
+  listEl.innerHTML = html;
+
+  // Pager
+  const pager = document.getElementById('recordsPager');
+  if (totalPages > 1) {
+    pager.style.display = 'flex';
+    document.getElementById('pagerPrev').disabled = _recordsPage === 0;
+    document.getElementById('pagerNext').disabled = _recordsPage >= totalPages - 1;
+    document.getElementById('pagerPrev').textContent = t('prevPage');
+    document.getElementById('pagerNext').textContent = t('nextPage');
+    document.getElementById('pagerInfo').textContent = t('pageOf') + ' ' + (_recordsPage+1) + ' / ' + totalPages;
+  } else {
+    pager.style.display = 'none';
+  }
+}
+
+function recordsPrevPage() { _recordsPage--; renderRecords(); }
+function recordsNextPage() { _recordsPage++; renderRecords(); }
+
+// Load a record's full data into the form
+function loadRecord(ref) {
+  const listEl = document.getElementById('recordsList');
+  listEl.innerHTML = '<div class="records-empty">' + t('loadingRecords') + '</div>';
+  showLoading(t('loadFetch'));
+
+  google.script.run
+    .withSuccessHandler(function(payload) {
+      hideLoading();
+      applyRecordToForm(payload, ref);
+      closeRecordsModal();
+    })
+    .withFailureHandler(function(err) {
+      hideLoading();
+      listEl.innerHTML = '<div class="records-empty">' + (err.message || err) + '</div>';
+    })
+    .getServicesRecord(ref);
+}
+
+// Fill the whole form from a loaded payload
+function applyRecordToForm(payload, ref) {
+  // Client fields
+  document.getElementById('clientName').value  = payload.clientName || '';
+  document.getElementById('phone').value        = payload.phone || '';
+  document.getElementById('generalNotes').value = payload.notes || '';
+  document.getElementById('occasion').value     = payload.occasion || '';
+  const dd = document.getElementById('deliveryDate');
+  dd.value = payload.deliveryDate || '';
+  dd.dataset.hijri = payload.deliveryHijri || '';
+
+  // Checkboxes
+  document.getElementById('applyVAT').checked      = payload.applyVAT === true;
+  document.getElementById('applyDiscount').checked = payload.applyDiscount === true;
+
+  // Clear existing item cards
+  document.querySelectorAll('[id^="item-card-"]').forEach(c => c.remove());
+  itemData.length = 0;
+  itemCount = 0;
+
+  // Rebuild items as locked cards
+  const items = payload.items || [];
+  if (!items.length) {
+    addItem(); // at least one empty card
+  } else {
+    items.forEach(it => {
+      const idx = itemCount++;
+      itemData[idx] = it;
+      colors[idx] = it.colors || 5;
+      const div = document.createElement('div');
+      div.className = 'card locked';
+      div.id = 'item-card-' + idx;
+      div.innerHTML = buildCardHTML(idx);
+      document.getElementById('itemsContainer').appendChild(div);
+      // Fill locked summary
+      document.getElementById('locked-label-'+idx).textContent = it.serviceType || '';
+      document.getElementById('locked-desc-'+idx).textContent  =
+        (it.description||'') + (it.tier ? ' · ' + it.tier : '') + (it.qty > 1 ? ' × '+it.qty : '')
+        + (it.fabricSupply === 'us' ? ' · ' + t('fabricByUs') : '');
+      document.getElementById('locked-price-'+idx).textContent = 'SAR ' + fmt(it.lineTotal||0);
+    });
+  }
+
+  // Editing state
+  const isInvFromQuote = _recordsMode === 'invFromQuote';
+  if (isInvFromQuote) {
+    // Creating a NEW invoice from a quote — set quote ref, force new save, doc=invoice
+    _existingRef = '';
+    _saveMode = 'new';
+    // Pre-fill quote reference for the invoice
+    setTimeout(() => {
+      const qr = document.getElementById('quoteRef');
+      if (qr) qr.value = ref;
+    }, 100);
+    clearEditing();
+    showSuccess(lang==='ar' ? 'تم تحميل عرض السعر. اضغط تحميل PDF واختر فاتورة.' : 'Quote loaded. Tap Download PDF and choose Invoice.');
+  } else {
+    // Editing existing — enable update mode
+    _existingRef = ref;
+    _saveMode = 'update';
+    showEditingBanner(ref);
+  }
+
+  updateLiveTotal();
+  document.getElementById('pdfBtn').disabled = false;
+  document.getElementById('waBtn').disabled  = false;
+  window.scrollTo({ top:0, behavior:'smooth' });
+}
+
+document.getElementById('recordsModal').addEventListener('click', function(e) {
+  if (e.target === this) closeRecordsModal();
+});
+
+// ═══════════════════════════════════════════════
+// DATE PICKER (Gregorian + Hijri)
+// ═══════════════════════════════════════════════
+function openDatePicker() {
+  _calType = 'greg';
+  _calView = new Date();
+  _selectedDate = null;
+  document.getElementById('dateTitle').textContent = t('deliveryPickTitle');
+  document.getElementById('cal-greg').textContent = t('calGregorian');
+  document.getElementById('cal-hijri').textContent = t('calHijri');
+  document.getElementById('cal-greg').classList.add('active');
+  document.getElementById('cal-hijri').classList.remove('active');
+  document.getElementById('calPreview').textContent = '';
+  renderCalendar();
+  document.getElementById('dateModal').classList.add('open');
+}
+function closeDatePicker() { document.getElementById('dateModal').classList.remove('open'); }
+
+function setCalType(type) {
+  _calType = type;
+  document.getElementById('cal-greg').classList.toggle('active', type === 'greg');
+  document.getElementById('cal-hijri').classList.toggle('active', type === 'hijri');
+  renderCalendar();
+}
+
+function calPrevMonth() {
+  _calView.setMonth(_calView.getMonth() - 1);
+  renderCalendar();
+}
+function calNextMonth() {
+  _calView.setMonth(_calView.getMonth() + 1);
+  renderCalendar();
+}
+
+function renderCalendar() {
+  const grid = document.getElementById('calGrid');
+  const label = document.getElementById('calMonthLabel');
+  const daysShort = T[lang].daysShort;
+
+  // Day name headers
+  let html = '';
+  daysShort.forEach(d => { html += '<div class="cal-dayname">' + d + '</div>'; });
+
+  // We always navigate by Gregorian month internally
+  const year  = _calView.getFullYear();
+  const month = _calView.getMonth(); // 0-based
+  const first = new Date(year, month, 1);
+  const startDay = first.getDay(); // 0=Sunday
+  const daysInMonth = new Date(year, month+1, 0).getDate();
+
+  // Month label — show gregorian, and if hijri mode, show hijri range
+  if (_calType === 'greg') {
+    label.textContent = T[lang].monthsGreg[month] + ' ' + year;
+  } else {
+    // Show the hijri month(s) spanning this gregorian month
+    const midH = gregToHijriJS(year, month+1, 15);
+    label.textContent = T[lang].monthsHijri[midH.month-1] + ' ' + midH.year + ' هـ';
+  }
+
+  // Empty cells before day 1
+  for (let i = 0; i < startDay; i++) html += '<div class="cal-day empty"></div>';
+
+  const today = new Date();
+  for (let d = 1; d <= daysInMonth; d++) {
+    const isToday = (d === today.getDate() && month === today.getMonth() && year === today.getFullYear());
+    let dayLabel = d;
+    if (_calType === 'hijri') {
+      const h = gregToHijriJS(year, month+1, d);
+      dayLabel = h.day;
+    }
+    const isSel = _selectedDate && _selectedDate.gY === year && _selectedDate.gM === month && _selectedDate.gD === d;
+    html += `<div class="cal-day ${isToday?'today':''} ${isSel?'selected':''}" onclick="pickDay(${year},${month},${d})">${dayLabel}</div>`;
+  }
+  grid.innerHTML = html;
+}
+
+function pickDay(year, month, day) {
+  _selectedDate = { gY:year, gM:month, gD:day };
+  // Gregorian string dd/MM/yyyy
+  const gStr = String(day).padStart(2,'0') + '/' + String(month+1).padStart(2,'0') + '/' + year;
+  // Hijri
+  const h = gregToHijriJS(year, month+1, day);
+  const hStr = String(h.day).padStart(2,'0') + '/' + String(h.month).padStart(2,'0') + '/' + h.year + ' هـ';
+
+  _selectedDate.greg  = gStr;
+  _selectedDate.hijri = hStr;
+
+  document.getElementById('calPreview').textContent =
+    (lang==='ar' ? 'ميلادي: ' : 'Gregorian: ') + gStr + '   |   ' +
+    (lang==='ar' ? 'هجري: ' : 'Hijri: ') + hStr;
+  renderCalendar();
+}
+
+function confirmDatePick() {
+  if (!_selectedDate) { closeDatePicker(); return; }
+  const dd = document.getElementById('deliveryDate');
+  // Invoice/quote always uses Gregorian as main value
+  dd.value = _selectedDate.greg;
+  dd.dataset.hijri = _selectedDate.hijri;
+  closeDatePicker();
+}
+function clearDatePick() {
+  _selectedDate = null;
+  const dd = document.getElementById('deliveryDate');
+  dd.value = '';
+  dd.dataset.hijri = '';
+  document.getElementById('calPreview').textContent = '';
+  closeDatePicker();
+}
+
+document.getElementById('dateModal').addEventListener('click', function(e) {
+  if (e.target === this) closeDatePicker();
+});
+
+// Client-side Hijri conversion (Kuwaiti algorithm — matches Umm al-Qura closely)
+function gregToHijriJS(gy, gm, gd) {
+  // gm 1-based
+  let jd = intPart((1461 * (gy + 4800 + intPart((gm - 14) / 12))) / 4)
+         + intPart((367 * (gm - 2 - 12 * intPart((gm - 14) / 12))) / 12)
+         - intPart((3 * intPart((gy + 4900 + intPart((gm - 14) / 12)) / 100)) / 4)
+         + gd - 32075;
+  let l = jd - 1948440 + 10632;
+  let n = intPart((l - 1) / 10631);
+  l = l - 10631 * n + 354;
+  let j = (intPart((10985 - l) / 5316)) * (intPart((50 * l) / 17719))
+        + (intPart(l / 5670)) * (intPart((43 * l) / 15238));
+  l = l - (intPart((30 - j) / 15)) * (intPart((17719 * j) / 50))
+        - (intPart(j / 16)) * (intPart((15238 * j) / 43)) + 29;
+  let m = intPart((24 * l) / 709);
+  let d = l - intPart((709 * m) / 24);
+  let y = 30 * n + j - 30;
+  return { year: y, month: m, day: d };
+}
+function intPart(x) { return Math.floor(x); }
+
+// ═══════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════
+addItem();
+
+</script>
+<div class="pwa-offline" id="pwaOffline">No internet — the calculator needs a connection · لا يوجد اتصال بالإنترنت</div>
+<script>
+(function () {
+  // offline banner
+  var b = document.getElementById('pwaOffline');
+  function net() { b.classList.toggle('on', !navigator.onLine); }
+  addEventListener('online', net); addEventListener('offline', net); net();
+
+  // refresh button on the black bar (left side; right side in Arabic)
+  var bar = document.querySelector('.lang-bar');
+  if (bar) {
+    var r = document.createElement('button');
+    r.className = 'pwa-refresh'; r.type = 'button'; r.setAttribute('aria-label', 'Refresh');
+    r.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11a8 8 0 1 0-2.34 5.66"/><path d="M20 4v7h-7"/></svg>';
+    r.onclick = function () { r.classList.add('spin'); location.reload(); };
+    bar.insertBefore(r, bar.firstChild);
+  }
+
+  // hide launch screen once the app has loaded (min 0.9s so the monogram is seen)
+  var s = document.getElementById('pwaSplash'), t0 = Date.now(), done = false;
+  function hide() { if (done || !s) return; done = true;
+    setTimeout(function () { s.classList.add('hide'); setTimeout(function () { s.remove(); }, 500); },
+      Math.max(0, 900 - (Date.now() - t0))); }
+  if (document.readyState === 'complete') hide(); else addEventListener('load', hide);
+  setTimeout(hide, 6000); // safety net
+
+  if ('serviceWorker' in navigator) addEventListener('load', function () { navigator.serviceWorker.register('sw.js'); });
+})();
 </script>
 </body>
 </html>
